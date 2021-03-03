@@ -8,7 +8,7 @@ const ChangePasswordUserForm = (props) => {
   return (
     <Modal
       visible={props.visible}
-      title="Change Password"
+      title="Ubah Password User"
       okText="Change"
       cancelText="Cancel"
       onCancel={props.onCancel}
@@ -32,10 +32,10 @@ const ChangePasswordUserForm = (props) => {
       >
         <Form.Item
           name="password"
-          label="New Password"
+          label="Password Baru"
           rules={[
-            { required: true, message: 'Password is required' },
-            { min: 8, message: 'Password is minimal 8 length' }
+            { required: true, message: 'Password baru dibutuhkan' },
+            { min: 8, message: 'Password minimal 8 digit' }
           ]}
           hasFeedback
         >
@@ -44,18 +44,18 @@ const ChangePasswordUserForm = (props) => {
 
         <Form.Item
           name="password_confirmation"
-          label="Confirm New Password"
+          label="Konfirmasi Password Baru"
           dependencies={['password']}
           hasFeedback
           rules={[
-            { required: true, message: 'Confirm the password' },
+            { required: true, message: 'Harap konfirmasi password baru' },
             ({ getFieldValue }) => ({
               validator(_, value) {
                 if (!value || getFieldValue('password') === value) {
                   return Promise.resolve();
                 }
 
-                return Promise.reject(new Error('The password confirmation does not match'));
+                return Promise.reject(new Error('Konfirmasi password baru tidak sesuai'));
               },
             })
           ]}

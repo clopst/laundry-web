@@ -103,7 +103,7 @@ const UserManagement = (props) => {
 
   const columns = [
     {
-        title: 'Name',
+        title: 'Nama',
         key: 'name',
         dataIndex: 'name',
         sorter: true,
@@ -135,7 +135,7 @@ const UserManagement = (props) => {
                 icon={<FormOutlined />} 
                 onClick={handleClickEdit(record.id)} />
             </Popover>
-            <Popover content="Change Password">
+            <Popover content="Ubah Password">
               <Button 
                 type="default" 
                 icon={<LockOutlined />}
@@ -179,8 +179,8 @@ const UserManagement = (props) => {
           name="password"
           label="Password"
           rules={[
-            { required: true, message: 'Password is required' },
-            { min: 8, message: 'Password is minimal 8 length' }
+            { required: true, message: 'Password dibutuhkan' },
+            { min: 8, message: 'Password minimal 8 digit' }
           ]}
           hasFeedback
         >
@@ -189,18 +189,18 @@ const UserManagement = (props) => {
 
         <Form.Item
           name="password_confirmation"
-          label="Confirm Password"
+          label="Konfirmasi Password"
           dependencies={['password']}
           hasFeedback
           rules={[
-            { required: true, message: 'Confirm the password' },
+            { required: true, message: 'Harap konfirmasi password' },
             ({ getFieldValue }) => ({
               validator(_, value) {
                 if (!value || getFieldValue('password') === value) {
                   return Promise.resolve();
                 }
 
-                return Promise.reject(new Error('The password confirmation does not match'));
+                return Promise.reject(new Error('Konfirmasi password tidak sesuai'));
               },
             })
           ]}

@@ -68,9 +68,9 @@ const Customer = (props) => {
     const data = dataSource.find(data => data.id === id);
 
     Modal.confirm({
-      title: 'Delete customer ' + data.name + '?',
+      title: 'Hapus pelanggan "' + data.name + '"?',
       icon: <ExclamationCircleOutlined />,
-      content: 'This outlet will be deleted permanently',
+      content: 'Data pelanggan ini akan dihapus secara permanen',
       onOk: () => (
         new Promise((resolve, reject) => {
           setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
@@ -84,7 +84,7 @@ const Customer = (props) => {
 
   const columns = [
     {
-        title: 'Name',
+        title: 'Nama Customer',
         key: 'name',
         dataIndex: 'name',
         sorter: true,
@@ -96,12 +96,12 @@ const Customer = (props) => {
         dataIndex: 'email'
     },
     {
-        title: 'Phone Number',
+        title: 'Nomor Telepon',
         key: 'phoneNumber',
         dataIndex: 'phoneNumber'
     },
     {
-        title: 'Address',
+        title: 'Alamat',
         key: 'address',
         dataIndex: 'address'
     },

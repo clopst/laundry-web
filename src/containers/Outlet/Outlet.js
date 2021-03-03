@@ -88,9 +88,9 @@ const Outlet = (props) => {
     const data = dataSource.find(data => data.id === id);
 
     Modal.confirm({
-      title: 'Delete outlet ' + data.name + '?',
+      title: 'Hapus outlet "' + data.name + '"?',
       icon: <ExclamationCircleOutlined />,
-      content: 'This outlet will be deleted permanently',
+      content: 'Outlet ini akan dihapus secara permanen',
       onOk: () => (
         new Promise((resolve, reject) => {
           setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
@@ -104,19 +104,19 @@ const Outlet = (props) => {
 
   const columns = [
     {
-        title: 'Outlet Name',
+        title: 'Nama Outlet',
         key: 'name',
         dataIndex: 'name',
         sorter: true,
         sortDirections: ['descend', 'ascend'],
     },
     {
-        title: 'Phone Number',
+        title: 'Nomor Telepon',
         key: 'phoneNumber',
         dataIndex: 'phoneNumber'
     },
     {
-        title: 'Address',
+        title: 'Alamat',
         key: 'address',
         dataIndex: 'address'
     },

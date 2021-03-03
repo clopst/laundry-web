@@ -10,9 +10,9 @@ const OutletForm = (props) => (
   <ModalForm {...props}>
     <Form.Item 
       name="name" 
-      label="Outlet Name"
+      label="Nama Outlet"
       rules={[
-        { required: true, message: 'Outlet name is required' }
+        { required: true, message: 'Nama outlet dibutuhkan' }
       ]}
     >
       <Input />
@@ -20,9 +20,9 @@ const OutletForm = (props) => (
     
     <Form.Item 
       name="code" 
-      label="Outlet Code"
+      label="Kode Outlet"
       rules={[
-        { required: true, message: 'Outlet code is required' }
+        { required: true, message: 'Kode outlet dibutuhkan' }
       ]}
     >
       <Input />
@@ -30,9 +30,9 @@ const OutletForm = (props) => (
 
     <Form.Item 
       name="phoneNumber"
-      label="Phone Number"
+      label="Nomor Telepon"
       rules={[
-        { required: true, message: 'Phone number is required' }
+        { required: true, message: 'Nomor telepon dibutuhkan' }
       ]}
     >
       <Input />
@@ -40,9 +40,9 @@ const OutletForm = (props) => (
     
     <Form.Item 
       name="address"
-      label="Address"
+      label="Alamat"
       rules={[
-        { required: true, message: 'Address is required' }
+        { required: true, message: 'Alamat dibutuhkan' }
       ]}
     >
       <Input.TextArea />
@@ -51,15 +51,12 @@ const OutletForm = (props) => (
     <Form.Item 
       name="owners"
       label="Owner"
-      rules={[
-        { required: true, message: 'Owner is required' }
-      ]}
     >
       <Select
         mode="multiple"
         showSearch
         filterOption={selectFilterOption}
-        placeholder="Select owner for this outlet"
+        placeholder="Pilih owner untuk outlet ini"
         allowClear
       >
         {props.owners.map(role => (
@@ -70,16 +67,13 @@ const OutletForm = (props) => (
     
     <Form.Item 
       name="cashiers"
-      label="Cashier"
-      rules={[
-        { required: true, message: 'Cashier is required' }
-      ]}
+      label="Kasir"
     >
       <Select
         mode="multiple"
         showSearch
         filterOption={selectFilterOption}
-        placeholder="Select cashier for this outlet"
+        placeholder="Pilih kasir untuk outlet ini"
         allowClear
       >
         {props.cashiers.map(role => (

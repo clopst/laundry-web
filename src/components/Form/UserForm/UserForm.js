@@ -21,9 +21,9 @@ const UserForm = (props) => (
   <ModalForm {...props}>
     <Form.Item 
       name="name" 
-      label="Name"
+      label="Nama"
       rules={[
-        { required: true, message: 'Name is required' }
+        { required: true, message: 'Nama dibutuhkan' }
       ]}
     >
       <Input />
@@ -33,7 +33,7 @@ const UserForm = (props) => (
       name="username" 
       label="Username"
       rules={[
-        { required: true, message: 'Username is required' }
+        { required: true, message: 'Username dibutuhkan' }
       ]}
     >
       <Input />
@@ -43,8 +43,8 @@ const UserForm = (props) => (
       name="email"
       label="Email"
       rules={[
-        { type: 'email', message: 'Input a valid email' },
-        { required: true, message: 'Email is required' }
+        { type: 'email', message: 'Masukan email yang valid' },
+        { required: true, message: 'Email dibutuhkan' }
       ]}
     >
       <Input />
@@ -54,7 +54,7 @@ const UserForm = (props) => (
       name="role"
       label="Role"
       rules={[
-        { required: true, message: 'Role is required' }
+        { required: true, message: 'Role dibutuhkan' }
       ]}
     >
       <Select

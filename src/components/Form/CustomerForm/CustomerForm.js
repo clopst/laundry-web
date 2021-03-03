@@ -6,9 +6,9 @@ const CustomerForm = (props) => (
   <ModalForm {...props}>
     <Form.Item 
       name="name" 
-      label="Name"
+      label="Nama Customer"
       rules={[
-        { required: true, message: 'Name is required' }
+        { required: true, message: 'Nama customer dibutuhkan' }
       ]}
     >
       <Input />
@@ -18,8 +18,8 @@ const CustomerForm = (props) => (
       name="email"
       label="Email"
       rules={[
-        { type: 'email', message: 'Input a valid email' },
-        { required: true, message: 'Email is required' }
+        { type: 'email', message: 'Masukkan email yang valid' },
+        { required: true, message: 'Email dibutuhkan' }
       ]}
     >
       <Input />
@@ -27,9 +27,9 @@ const CustomerForm = (props) => (
 
     <Form.Item 
       name="phoneNumber"
-      label="Phone Number"
+      label="Nomor Telepon"
       rules={[
-        { required: true, message: 'Phone number is required' }
+        { required: true, message: 'Nomor telepon dibutuhkan' }
       ]}
     >
       <Input />
@@ -37,9 +37,9 @@ const CustomerForm = (props) => (
     
     <Form.Item 
       name="address"
-      label="Address"
+      label="Alamat"
       rules={[
-        { required: true, message: 'Address is required' }
+        { required: true, message: 'Alamat dibutuhkan' }
       ]}
     >
       <Input.TextArea />
