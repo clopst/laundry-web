@@ -11,6 +11,7 @@ import {
 import './SiderLayout.css';
 import { NavLink, Route, withRouter } from 'react-router-dom';
 import UserManagement from '../UserManagement/UserManagement';
+import Customer from '../Customer/Customer';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -77,7 +78,7 @@ const SiderLayout = (props) => {
           <div className="site-layout-background" style={{ padding: 24, minHeight: 540 }}>
             <Route path="/" exact render={() => 'Dashboard bung'} />
             <Route path="/users" exact component={UserManagement} />
-            <Route path="/customers" exact render={() => 'Customers bung'} />
+            <Route path="/customers" exact component={Customer} />
           </div>
         </Content>
 
