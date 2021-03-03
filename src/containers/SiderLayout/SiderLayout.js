@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Layout, Menu, Breadcrumb } from 'antd';
+import { Layout, Menu } from 'antd';
 import {
   PieChartOutlined,
   ShopOutlined,
@@ -9,9 +9,10 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import './SiderLayout.css';
+import { NavLink, Route, withRouter } from 'react-router-dom';
+import UserManagement from '../UserManagement/UserManagement';
 
 const { Header, Content, Footer, Sider } = Layout;
-const { SubMenu } = Menu;
 
 const SiderLayout = (props) => {
   const [collapsed, setCollapsed] = useState(false);
@@ -26,24 +27,40 @@ const SiderLayout = (props) => {
       <Sider collapsible collapsed={collapsed} onCollapse={handleCollapse}>
         <div className="logo" />
 
-        <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
-          <Menu.Item key="1" icon={<PieChartOutlined />}>
-            Dashboard
+        <Menu 
+          theme="dark"
+          mode="inline"
+          defaultSelectedKeys={['/']}
+          selectedKeys={[props.location.pathname]}>
+          <Menu.Item key="/" icon={<PieChartOutlined />}>
+            <NavLink to="/">
+              Dashboard
+            </NavLink>
           </Menu.Item>
-          <Menu.Item key="2" icon={<UserOutlined />}>
-            User Management
+          <Menu.Item key="/users" icon={<UserOutlined />}>
+            <NavLink to="/users">
+              User Management
+            </NavLink>
           </Menu.Item>
-          <Menu.Item key="3" icon={<TeamOutlined />}>
-            Customers
+          <Menu.Item key="/customers" icon={<TeamOutlined />}>
+            <NavLink to="/customers">
+              Customers
+            </NavLink>
           </Menu.Item>
-          <Menu.Item key="4" icon={<ShopOutlined />}>
-            Outlets
+          <Menu.Item key="/outlets" icon={<ShopOutlined />}>
+            <NavLink to="/outlets">
+              Outlets
+            </NavLink>
           </Menu.Item>
-          <Menu.Item key="5" icon={<SkinOutlined />}>
-            Products
+          <Menu.Item key="/products" icon={<SkinOutlined />}>
+            <NavLink to="/products">
+              Products
+            </NavLink>
           </Menu.Item>
-          <Menu.Item key="6" icon={<ShoppingOutlined />}>
-            Transactions
+          <Menu.Item key="/transactions" icon={<ShoppingOutlined />}>
+            <NavLink to="/transactions">
+              Transactions
+            </NavLink>
           </Menu.Item>
         </Menu>
       </Sider>
@@ -57,8 +74,10 @@ const SiderLayout = (props) => {
             <Breadcrumb.Item>User</Breadcrumb.Item>
             <Breadcrumb.Item>Bill</Breadcrumb.Item>
           </Breadcrumb> */}
-          <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
-            Bill is a cat.
+          <div className="site-layout-background" style={{ padding: 24, minHeight: 540 }}>
+            <Route path="/" exact render={() => 'Dashboard bung'} />
+            <Route path="/users" exact component={UserManagement} />
+            <Route path="/customers" exact render={() => 'Customers bung'} />
           </div>
         </Content>
 
@@ -68,4 +87,4 @@ const SiderLayout = (props) => {
   )
 }
 
-export default SiderLayout;
+export default withRouter(SiderLayout);

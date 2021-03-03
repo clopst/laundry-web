@@ -1,0 +1,12 @@
+.page-header {
+  width: 100%;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.page-action {
+  display: flex;
+  align-items: center;
+}

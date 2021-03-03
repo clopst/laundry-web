@@ -1,5 +1,5 @@
-import logo from './logo.svg';
 import './App.css';
+import { BrowserRouter } from 'react-router-dom';
 import SiderLayout from './containers/SiderLayout/SiderLayout';
 
 function App() {
@@ -20,8 +20,9 @@ function App() {
     //     </a>
     //   </header>
     // </div>
-    
-    <SiderLayout />
+    <BrowserRouter>
+      <SiderLayout />
+    </BrowserRouter>
   );
 }
 
