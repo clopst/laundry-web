@@ -3,9 +3,9 @@ import useDebounce from '../../hooks/useDebounce/useDebounce';
 import { Button, Form, Input, Modal, Popover, Space, Table } from 'antd';
 import { DeleteOutlined, ExclamationCircleOutlined, FormOutlined } from '@ant-design/icons';
 import PageHeader from '../../components/PageHeader/PageHeader';
-import CustomerForm from '../../components/Form/CustomerForm/CustomerForm';
+import OutletForm from '../../components/Form/OutletForm/OutletForm';
 
-const Customer = (props) => {
+const Outlet = (props) => {
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm, 800);
 
@@ -19,17 +19,37 @@ const Customer = (props) => {
   const dataSource = [
     {
         id: 1,
-        name: 'John Doe',
-        email: 'johndoe@example.com',
+        name: 'Outlet Bandung',
         phoneNumber: '081244556677',
-        address: 'Jl. Sukamiskin No.7'
+        address: 'Jl. Bandung Negara'
     },
     {
         id: 2,
-        name: 'Jane Doe',
-        email: 'janedoe@example.com',
+        name: 'Outlet Jakarta',
         phoneNumber: '081244556688',
-        address: 'Jl. Sukamiskin No.9'
+        address: 'Jl. Jakarta Negara'
+    }
+  ];
+
+  const owners = [
+    {
+        value: 1,
+        label: 'John Doe'
+    },
+    {
+        value: 2,
+        label: 'Jane Doe'
+    }
+  ];
+
+  const cashiers = [
+    {
+        value: 3,
+        label: 'Bobby Doe'
+    },
+    {
+        value: 4,
+        label: 'Albert Doe'
     }
   ];
 
@@ -41,7 +61,7 @@ const Customer = (props) => {
     setSearchTerm(e.target.value);
   }
 
-  const handleCreateCustomer = (values) => {
+  const handleCreateOutlet = (values) => {
     console.log(values);
     setConfirmLoading(true);
     setTimeout(() => {
@@ -55,7 +75,7 @@ const Customer = (props) => {
     setVisibleEdit(true);
   }
   
-  const handleEditCustomer = (values) => {
+  const handleEditOutlet = (values) => {
     console.log(values);
     setConfirmLoading(true);
     setTimeout(() => {
@@ -68,7 +88,7 @@ const Customer = (props) => {
     const data = dataSource.find(data => data.id === id);
 
     Modal.confirm({
-      title: 'Delete customer ' + data.name + '?',
+      title: 'Delete outlet ' + data.name + '?',
       icon: <ExclamationCircleOutlined />,
       content: 'This outlet will be deleted permanently',
       onOk: () => (
@@ -84,16 +104,11 @@ const Customer = (props) => {
 
   const columns = [
     {
-        title: 'Name',
+        title: 'Outlet Name',
         key: 'name',
         dataIndex: 'name',
         sorter: true,
         sortDirections: ['descend', 'ascend'],
-    },
-    {
-        title: 'Email',
-        key: 'email',
-        dataIndex: 'email'
     },
     {
         title: 'Phone Number',
@@ -134,32 +149,36 @@ const Customer = (props) => {
 
   return (
     <React.Fragment>
-      <PageHeader title="Customers">
+      <PageHeader title="Outlets">
         <Input placeholder="Search ..." onChange={handleSearch} />
         <Button type="primary" onClick={() => setVisibleCreate(true)}>Create</Button>
       </PageHeader>
 
       <Table dataSource={dataSource} columns={columns} rowKey="id" onChange={handleChangeTable} />
       
-      <CustomerForm
+      <OutletForm
         form={createForm}
-        formName="customer-create-form"
+        formName="outlet-create-form"
         visible={visibleCreate}
-        title="Create Customer"
-        onCreate={handleCreateCustomer}
+        title="Create Outlet"
+        onCreate={handleCreateOutlet}
         onCancel={() => setVisibleCreate(false)}
-        confirmLoading={confirmLoading} />
+        confirmLoading={confirmLoading}
+        owners={owners}
+        cashiers={cashiers} />
       
-      <CustomerForm
+      <OutletForm
         form={editForm}
-        formName="customer-edit-form"
+        formName="outlet-edit-form"
         visible={visibleEdit}
-        title="Edit Customer"
-        onCreate={handleEditCustomer}
+        title="Edit Outlet"
+        onCreate={handleEditOutlet}
         onCancel={() => setVisibleEdit(false)}
-        confirmLoading={confirmLoading} />
+        confirmLoading={confirmLoading}
+        owners={owners}
+        cashiers={cashiers} />
     </React.Fragment>
   );
 }
 
-export default Customer;
+export default Outlet;
