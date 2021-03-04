@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Layout, Menu } from 'antd';
+import { Avatar, Dropdown, Layout, Menu } from 'antd';
 import {
   PieChartOutlined,
   ShopOutlined,
@@ -13,8 +13,22 @@ import { NavLink, Route, withRouter } from 'react-router-dom';
 import UserManagement from '../UserManagement/UserManagement';
 import Customer from '../Customer/Customer';
 import Outlet from '../Outlet/Outlet';
+import Product from '../Product/Product';
 
 const { Header, Content, Footer, Sider } = Layout;
+
+const profileMenu = (
+  <Menu>
+    <Menu.Item key="0">
+      <a href="https://www.antgroup.com">1st menu item</a>
+    </Menu.Item>
+    <Menu.Item key="1">
+      <a href="https://www.aliyun.com">2nd menu item</a>
+    </Menu.Item>
+    <Menu.Divider />
+    <Menu.Item key="3">3rd menu item</Menu.Item>
+  </Menu>
+);
 
 const SiderLayout = (props) => {
   const [collapsed, setCollapsed] = useState(false);
@@ -69,18 +83,28 @@ const SiderLayout = (props) => {
 
       <Layout className="site-layout">
         <Header className="site-layout-background" style={{ padding: '0px 24px' }}>
-          <h2>Laundry App</h2>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}>
+            <h2>Laundry App</h2>
+            <Dropdown overlay={profileMenu} trigger={['click']}>
+              <Avatar size='large' icon={<UserOutlined />} style={{ cursor: 'pointer' }} />
+            </Dropdown>
+          </div>
         </Header>
         <Content style={{ margin: '16px' }}>
           {/* <Breadcrumb style={{ margin: '16px 0' }}>
             <Breadcrumb.Item>User</Breadcrumb.Item>
             <Breadcrumb.Item>Bill</Breadcrumb.Item>
           </Breadcrumb> */}
-          <div className="site-layout-background" style={{ padding: 24, minHeight: 540 }}>
+          <div className="site-layout-background" style={{ padding: 24, height: '100%' }}>
             <Route path="/" exact render={() => 'Dashboard bung'} />
             <Route path="/users" exact component={UserManagement} />
             <Route path="/customers" exact component={Customer} />
             <Route path="/outlets" exact component={Outlet} />
+            <Route path="/products" exact component={Product} />
           </div>
         </Content>
 
