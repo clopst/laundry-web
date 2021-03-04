@@ -3,16 +3,18 @@ import useDebounce from '../../hooks/useDebounce/useDebounce';
 import { Button, Form, Input, Modal, Popover, Space, Table } from 'antd';
 import { DeleteOutlined, ExclamationCircleOutlined, FormOutlined } from '@ant-design/icons';
 import PageHeader from '../../components/PageHeader/PageHeader';
-import ProductForm from '../../components/Form/ProductForm/ProductForm';
-import { currencyFormatter, currencyParser } from '../../helpers/Currency';
+import TransactionForm from '../../components/Form/TransactionForm/TransactionForm';
+import { currencyFormatter } from '../../helpers/Currency';
 
-const Product = (props) => {
+const Transaction = (props) => {
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm, 800);
 
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [visibleCreate, setVisibleCreate] = useState(false);
   const [visibleEdit, setVisibleEdit] = useState(false);
+
+  const [selectedProduct, setSelectedProduct] = useState(null);
   
   const [createForm] = Form.useForm();
   const [editForm] = Form.useForm();
@@ -20,17 +22,26 @@ const Product = (props) => {
   const dataSource = [
     {
         id: 1,
-        name: 'Paket Kiloan',
-        unit: 'kg',
-        price: 7000,
-        outlet_id: null
+        cashier_id: 3,
+        outlet_id: 1,
+        customer_id: 1,
+        invoice: 'LDB0001',
+        date: '2021-03-01',
+        product_id: 1,
+        qty: 4,
+        totalPrice: 28000
+        
     },
     {
-        id: 1,
-        name: 'Bed Cover',
-        unit: 'pcs',
-        price: 35000,
-        outlet_id: null
+        id: 2,
+        cashier_id: 4,
+        outlet_id: 2,
+        customer_id: 2,
+        invoice: 'LDB0002',
+        date: '2021-03-01',
+        product_id: 2,
+        qty: 1,
+        totalPrice: 35000
     },
   ];
 
@@ -44,6 +55,41 @@ const Product = (props) => {
         label: 'Outlet Jakarta'
     }
   ];
+  
+  const customers = [
+    {
+        value: 1,
+        label: 'John Doe'
+    },
+    {
+        value: 2,
+        label: 'Jane Doe'
+    }
+  ];
+
+  const cashiers = [
+    {
+        value: 3,
+        label: 'Bobby Doe'
+    },
+    {
+        value: 4,
+        label: 'Albert Doe'
+    }
+  ];
+
+  const products = [
+    {
+        value: 1,
+        label: 'Paket Kiloan',
+        unit: 'kg'
+    },
+    {
+        value: 2,
+        label: 'Bed Cover',
+        unit: 'pcs'
+    }
+  ]
 
   useEffect(() => {
     console.log('searching ...')
@@ -53,7 +99,7 @@ const Product = (props) => {
     setSearchTerm(e.target.value);
   }
 
-  const handleCreateProduct = (values) => {
+  const handleCreateTransaction = (values) => {
     console.log(values);
     setConfirmLoading(true);
     setTimeout(() => {
@@ -63,11 +109,13 @@ const Product = (props) => {
   }
 
   const handleClickEdit = (id) => () => {
-    editForm.setFieldsValue(dataSource.find(data => data.id === id));
+    const data = dataSource.find(data => data.id === id);
+    editForm.setFieldsValue(data);
+    setSelectedProduct(data.product_id);
     setVisibleEdit(true);
   }
   
-  const handleEditProduct = (values) => {
+  const handleEditTransaction = (values) => {
     console.log(values);
     setConfirmLoading(true);
     setTimeout(() => {
@@ -80,9 +128,9 @@ const Product = (props) => {
     const data = dataSource.find(data => data.id === id);
 
     Modal.confirm({
-      title: 'Hapus produk "' + data.name + '"?',
+      title: 'Hapus transaksi "' + data.name + '"?',
       icon: <ExclamationCircleOutlined />,
-      content: 'Produk ini akan dihapus secara permanen',
+      content: 'Transaksi ini akan dihapus secara permanen',
       onOk: () => (
         new Promise((resolve, reject) => {
           setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
@@ -96,28 +144,36 @@ const Product = (props) => {
 
   const columns = [
     {
-        title: 'Nama Produk',
-        key: 'name',
-        dataIndex: 'name',
+        title: 'Kode Invoice',
+        key: 'invoice',
+        dataIndex: 'invoice',
         sorter: true,
         sortDirections: ['descend', 'ascend'],
     },
     {
-        title: 'Unit Produk',
-        key: 'unit',
-        dataIndex: 'unit'
-    },
-    {
-        title: 'Harga',
-        key: 'price',
-        render: (text, record) => currencyFormatter(record.price)
+        title: 'Customer',
+        key: 'customer',
+        dataIndex: 'customer_id'
     },
     {
         title: 'Outlet',
-        key: 'outlet',
-        render: (text, record) => (
-          record.outlet_id ? record.outlet_id : 'Semua Outlet'
-        )
+        key: 'outlet_id',
+        dataIndex: 'outlet_id'
+    },
+    {
+        title: 'Produk',
+        key: 'product',
+        render: (text, record) => `${record.product_id}  (${record.qty})`
+    },
+    {
+        title: 'Harga',
+        key: 'totalPrice',
+        render: (text, record) => currencyFormatter(record.totalPrice)
+    },
+    {
+        title: 'Kasir',
+        key: 'cashier',
+        dataIndex: 'cashier_id'
     },
     {
         title: 'Actions',
@@ -148,34 +204,42 @@ const Product = (props) => {
 
   return (
     <React.Fragment>
-      <PageHeader title="Products">
+      <PageHeader title="Transactions">
         <Input placeholder="Search ..." onChange={handleSearch} />
         <Button type="primary" onClick={() => setVisibleCreate(true)}>Create</Button>
       </PageHeader>
 
       <Table dataSource={dataSource} columns={columns} rowKey="id" onChange={handleChangeTable} />
       
-      <ProductForm
+      <TransactionForm
         form={createForm}
-        formName="product-create-form"
+        formName="transaction-create-form"
         visible={visibleCreate}
-        title="Create Product"
-        onCreate={handleCreateProduct}
+        title="Create Transaksi"
+        onCreate={handleCreateTransaction}
         onCancel={() => setVisibleCreate(false)}
         confirmLoading={confirmLoading}
-        outlets={outlets} />
+        outlets={outlets}
+        customers={customers}
+        cashiers={cashiers}
+        products={products}
+        selectedProduct={selectedProduct} />
       
-      <ProductForm
+      <TransactionForm
         form={editForm}
-        formName="product-edit-form"
+        formName="transaction-edit-form"
         visible={visibleEdit}
-        title="Edit Product"
-        onCreate={handleEditProduct}
+        title="Edit Transaksi"
+        onCreate={handleEditTransaction}
         onCancel={() => setVisibleEdit(false)}
         confirmLoading={confirmLoading}
-        outlets={outlets} />
+        outlets={outlets}
+        customers={customers}
+        cashiers={cashiers}
+        products={products}
+        selectedProduct={selectedProduct} />
     </React.Fragment>
   );
 }
 
-export default Product;
+export default Transaction;

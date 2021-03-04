@@ -14,6 +14,7 @@ import UserManagement from '../UserManagement/UserManagement';
 import Customer from '../Customer/Customer';
 import Outlet from '../Outlet/Outlet';
 import Product from '../Product/Product';
+import Transaction from '../Transaction/Transaction';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -105,6 +106,7 @@ const SiderLayout = (props) => {
             <Route path="/customers" exact component={Customer} />
             <Route path="/outlets" exact component={Outlet} />
             <Route path="/products" exact component={Product} />
+            <Route path="/transactions" exact component={Transaction} />
           </div>
         </Content>
 

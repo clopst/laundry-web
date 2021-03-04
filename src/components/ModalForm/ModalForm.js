@@ -28,6 +28,8 @@ const ModalForm = (props) => {
         form={form}
         layout="vertical"
         name={props.formName}
+        onFieldsChange={props.onFieldsChange}
+        onValuesChange={props.onValuesChange}
       >
         {props.children}
       </Form>

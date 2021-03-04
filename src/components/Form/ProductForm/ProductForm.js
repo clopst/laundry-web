@@ -38,6 +38,7 @@ const ProductForm = (props) => (
     >
       <InputNumber
         style={{ width: '100%' }}
+        min={0}
         formatter={currencyFormatter}
         parser={currencyParser}
       />
