@@ -16,6 +16,7 @@ import Outlet from '../Outlet/Outlet';
 import Product from '../Product/Product';
 import Transaction from '../Transaction/Transaction';
 import Dashboard from '../Dashboard/Dashboard';
+import Profile from '../Profile/Profile';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Text } = Typography;
@@ -23,11 +24,11 @@ const { Text } = Typography;
 const profileMenu = (
   <Menu>
     <Text type="secondary" style={{ fontSize: 12, padding: 12 }}>Manage Account</Text>
-    <Menu.Item key="0">
-      <a href="https://www.antgroup.com">Profile</a>
+    <Menu.Item key="/">
+      <NavLink to="/profile">Profile</NavLink>
     </Menu.Item>
     <Menu.Divider />
-    <Menu.Item key="1">Logout</Menu.Item>
+    <Menu.Item key="/logout">Logout</Menu.Item>
   </Menu>
 );
 
@@ -108,6 +109,7 @@ const SiderLayout = (props) => {
           <Route path="/outlets" exact component={Outlet} />
           <Route path="/products" exact component={Product} />
           <Route path="/transactions" exact component={Transaction} />
+          <Route path="/profile" exact component={Profile} />
         </Content>
 
         <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>

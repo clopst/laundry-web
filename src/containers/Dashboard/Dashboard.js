@@ -1,13 +1,9 @@
 import React from 'react';
-import { Button, Card, Col, Row, Table, Typography } from 'antd';
+import { Card, Col, Row, Table, Typography } from 'antd';
 import { ShopOutlined, ShoppingOutlined, SkinOutlined, TeamOutlined } from '@ant-design/icons';
-import PageBackground from '../../components/PageBackground/PageBackground';
 import { currencyFormatter } from '../../helpers/Currency';
-import PageHeader from '../../components/PageHeader/PageHeader';
 
 const { Title } = Typography;
-
-const style = { background: '#0092ff', padding: '8px 0' };
 
 const Dashboard = (props) => {
   const iconStyle = {
