@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Avatar, Dropdown, Layout, Menu } from 'antd';
+import { Avatar, Dropdown, Layout, Menu, Typography } from 'antd';
 import {
   PieChartOutlined,
   ShopOutlined,
@@ -15,19 +15,19 @@ import Customer from '../Customer/Customer';
 import Outlet from '../Outlet/Outlet';
 import Product from '../Product/Product';
 import Transaction from '../Transaction/Transaction';
+import Dashboard from '../Dashboard/Dashboard';
 
 const { Header, Content, Footer, Sider } = Layout;
+const { Text } = Typography;
 
 const profileMenu = (
   <Menu>
+    <Text type="secondary" style={{ fontSize: 12, padding: 12 }}>Manage Account</Text>
     <Menu.Item key="0">
-      <a href="https://www.antgroup.com">1st menu item</a>
-    </Menu.Item>
-    <Menu.Item key="1">
-      <a href="https://www.aliyun.com">2nd menu item</a>
+      <a href="https://www.antgroup.com">Profile</a>
     </Menu.Item>
     <Menu.Divider />
-    <Menu.Item key="3">3rd menu item</Menu.Item>
+    <Menu.Item key="1">Logout</Menu.Item>
   </Menu>
 );
 
@@ -83,31 +83,31 @@ const SiderLayout = (props) => {
       </Sider>
 
       <Layout className="site-layout">
-        <Header className="site-layout-background" style={{ padding: '0px 24px' }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between'
-          }}>
-            <h2>Laundry App</h2>
-            <Dropdown overlay={profileMenu} trigger={['click']}>
-              <Avatar size='large' icon={<UserOutlined />} style={{ cursor: 'pointer' }} />
-            </Dropdown>
-          </div>
+        <Header className="site-layout-background" style={{
+          padding: '0px 24px', 
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between' }}
+        >
+          <Typography.Title level={3} style={{ marginTop: 8 }}>Laundry App</Typography.Title>
+          <Dropdown overlay={profileMenu} trigger={['click']}>
+            <Avatar size='default' icon={<UserOutlined />} style={{ cursor: 'pointer' }} />
+          </Dropdown>
         </Header>
         <Content style={{ margin: '16px' }}>
           {/* <Breadcrumb style={{ margin: '16px 0' }}>
             <Breadcrumb.Item>User</Breadcrumb.Item>
             <Breadcrumb.Item>Bill</Breadcrumb.Item>
           </Breadcrumb> */}
-          <div className="site-layout-background" style={{ padding: 24, height: '100%' }}>
-            <Route path="/" exact render={() => 'Dashboard bung'} />
-            <Route path="/users" exact component={UserManagement} />
-            <Route path="/customers" exact component={Customer} />
-            <Route path="/outlets" exact component={Outlet} />
-            <Route path="/products" exact component={Product} />
-            <Route path="/transactions" exact component={Transaction} />
-          </div>
+          {/* <div className="site-layout-background" style={{ padding: 24, height: '100%' }}>
+          </div> */}
+          
+          <Route path="/" exact component={Dashboard} />
+          <Route path="/users" exact component={UserManagement} />
+          <Route path="/customers" exact component={Customer} />
+          <Route path="/outlets" exact component={Outlet} />
+          <Route path="/products" exact component={Product} />
+          <Route path="/transactions" exact component={Transaction} />
         </Content>
 
         <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>

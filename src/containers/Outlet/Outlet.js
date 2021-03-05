@@ -4,6 +4,7 @@ import { Button, Form, Input, Modal, Popover, Space, Table } from 'antd';
 import { DeleteOutlined, ExclamationCircleOutlined, FormOutlined } from '@ant-design/icons';
 import PageHeader from '../../components/PageHeader/PageHeader';
 import OutletForm from '../../components/Form/OutletForm/OutletForm';
+import PageBackground from '../../components/PageBackground/PageBackground';
 
 const Outlet = (props) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -148,7 +149,7 @@ const Outlet = (props) => {
   }
 
   return (
-    <React.Fragment>
+    <PageBackground>
       <PageHeader title="Outlets">
         <Input placeholder="Search ..." onChange={handleSearch} />
         <Button type="primary" onClick={() => setVisibleCreate(true)}>Create</Button>
@@ -177,7 +178,7 @@ const Outlet = (props) => {
         confirmLoading={confirmLoading}
         owners={owners}
         cashiers={cashiers} />
-    </React.Fragment>
+    </PageBackground>
   );
 }
 

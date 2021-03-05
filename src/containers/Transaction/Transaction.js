@@ -1,10 +1,37 @@
 import React, { useEffect, useState } from 'react';
 import useDebounce from '../../hooks/useDebounce/useDebounce';
-import { Button, Form, Input, Modal, Popover, Space, Table } from 'antd';
+import { Button, Form, Input, Modal, Popover, Select, Space, Table } from 'antd';
 import { DeleteOutlined, ExclamationCircleOutlined, FormOutlined } from '@ant-design/icons';
 import PageHeader from '../../components/PageHeader/PageHeader';
 import TransactionForm from '../../components/Form/TransactionForm/TransactionForm';
 import { currencyFormatter } from '../../helpers/Currency';
+import PageBackground from '../../components/PageBackground/PageBackground';
+
+const TRANSACTION_STATUS = [
+  {
+    value: 'process',
+    label: 'Sedang Proses'
+  },
+  {
+    value: 'pickup',
+    label: 'Menunggu Diambil'
+  },
+  {
+    value: 'done',
+    label: 'Selesai'
+  },
+];
+
+const PAYMENT_STATUS = [
+  {
+    value: 'waiting',
+    label: 'Belum Dibayar'
+  },
+  {
+    value: 'done',
+    label: 'Sudah Dibayar'
+  },
+];
 
 const Transaction = (props) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -29,7 +56,9 @@ const Transaction = (props) => {
         date: '2021-03-01',
         product_id: 1,
         qty: 4,
-        totalPrice: 28000
+        totalPrice: 28000,
+        status: 'done',
+        payment: 'done'
         
     },
     {
@@ -41,7 +70,9 @@ const Transaction = (props) => {
         date: '2021-03-01',
         product_id: 2,
         qty: 1,
-        totalPrice: 35000
+        totalPrice: 35000,
+        status: 'process',
+        payment: 'waiting'
     },
   ];
 
@@ -203,7 +234,7 @@ const Transaction = (props) => {
   }
 
   return (
-    <React.Fragment>
+    <PageBackground>
       <PageHeader title="Transactions">
         <Input placeholder="Search ..." onChange={handleSearch} />
         <Button type="primary" onClick={() => setVisibleCreate(true)}>Create</Button>
@@ -237,8 +268,53 @@ const Transaction = (props) => {
         customers={customers}
         cashiers={cashiers}
         products={products}
-        selectedProduct={selectedProduct} />
-    </React.Fragment>
+        selectedProduct={selectedProduct}
+      >
+        <Form.Item
+          name="status"
+          label="Status Transaksi"
+          rules={[
+            { required: true, message: 'Status transaksi dibutuhkan' }
+          ]}
+          hasFeedback
+        >
+          <Select
+            showSearch
+            filterOption={(input, option) => (
+              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+            )}
+            placeholder="Pilih customer untuk transaksi ini"
+            allowClear
+          >
+            {TRANSACTION_STATUS.map(status => (
+              <Select.Option key={status.value} value={status.value}>{status.label}</Select.Option>
+            ))}
+          </Select>
+        </Form.Item>
+
+        <Form.Item
+          name="status"
+          label="Status Pembayaran"
+          rules={[
+            { required: true, message: 'Status pembayaran dibutuhkan' }
+          ]}
+          hasFeedback
+        >
+          <Select
+            showSearch
+            filterOption={(input, option) => (
+              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+            )}
+            placeholder="Pilih customer untuk transaksi ini"
+            allowClear
+          >
+            {PAYMENT_STATUS.map(status => (
+              <Select.Option key={status.value} value={status.value}>{status.label}</Select.Option>
+            ))}
+          </Select>
+        </Form.Item>
+      </TransactionForm>
+    </PageBackground>
   );
 }
 

@@ -4,6 +4,7 @@ import { Button, Form, Input, Modal, Popover, Space, Table } from 'antd';
 import { DeleteOutlined, ExclamationCircleOutlined, FormOutlined } from '@ant-design/icons';
 import PageHeader from '../../components/PageHeader/PageHeader';
 import CustomerForm from '../../components/Form/CustomerForm/CustomerForm';
+import PageBackground from '../../components/PageBackground/PageBackground';
 
 const Customer = (props) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -133,7 +134,7 @@ const Customer = (props) => {
   }
 
   return (
-    <React.Fragment>
+    <PageBackground>
       <PageHeader title="Customers">
         <Input placeholder="Search ..." onChange={handleSearch} />
         <Button type="primary" onClick={() => setVisibleCreate(true)}>Create</Button>
@@ -158,7 +159,7 @@ const Customer = (props) => {
         onCreate={handleEditCustomer}
         onCancel={() => setVisibleEdit(false)}
         confirmLoading={confirmLoading} />
-    </React.Fragment>
+    </PageBackground>
   );
 }
 

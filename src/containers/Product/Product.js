@@ -5,6 +5,7 @@ import { DeleteOutlined, ExclamationCircleOutlined, FormOutlined } from '@ant-de
 import PageHeader from '../../components/PageHeader/PageHeader';
 import ProductForm from '../../components/Form/ProductForm/ProductForm';
 import { currencyFormatter, currencyParser } from '../../helpers/Currency';
+import PageBackground from '../../components/PageBackground/PageBackground';
 
 const Product = (props) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -147,7 +148,7 @@ const Product = (props) => {
   }
 
   return (
-    <React.Fragment>
+    <PageBackground>
       <PageHeader title="Products">
         <Input placeholder="Search ..." onChange={handleSearch} />
         <Button type="primary" onClick={() => setVisibleCreate(true)}>Create</Button>
@@ -174,7 +175,7 @@ const Product = (props) => {
         onCancel={() => setVisibleEdit(false)}
         confirmLoading={confirmLoading}
         outlets={outlets} />
-    </React.Fragment>
+    </PageBackground>
   );
 }
 

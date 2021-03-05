@@ -5,6 +5,7 @@ import { DeleteOutlined, ExclamationCircleOutlined, FormOutlined, LockOutlined }
 import PageHeader from '../../components/PageHeader/PageHeader';
 import UserForm from '../../components/Form/UserForm/UserForm';
 import ChangePasswordUserForm from '../../components/Form/UserForm/ChangePasswordUserForm/ChangePasswordUserForm';
+import PageBackground from '../../components/PageBackground/PageBackground';
 
 const UserManagement = (props) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -158,7 +159,7 @@ const UserManagement = (props) => {
   }
 
   return (
-    <React.Fragment>
+    <PageBackground>
       <PageHeader title="User Management">
         <Input placeholder="Search ..." onChange={handleSearch} />
         <Button type="primary" onClick={() => setVisibleCreate(true)}>Create</Button>
@@ -224,7 +225,7 @@ const UserManagement = (props) => {
         onCreate={handleChangePasswordUser}
         onCancel={() => setVisibleChangePassword(false)}
         confirmLoading={confirmLoading} />
-    </React.Fragment>
+    </PageBackground>
   );
 }
 
