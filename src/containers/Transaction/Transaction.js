@@ -113,12 +113,14 @@ const Transaction = (props) => {
     {
         value: 1,
         label: 'Paket Kiloan',
-        unit: 'kg'
+        unit: 'kg',
+        price: 7000
     },
     {
         value: 2,
         label: 'Bed Cover',
-        unit: 'pcs'
+        unit: 'pcs',
+        price: 35000
     }
   ]
 

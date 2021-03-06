@@ -10,17 +10,30 @@ const selectFilterOption =  (input, option) => (
 const TransactionForm = (props) => {
   const { selectedProduct } = props;
   const [unit, setUnit] = useState('');
+  const [price, setPrice] = useState(0);
 
   useEffect(() => {
-    const unit = props.products.find(product => product.value === selectedProduct)?.unit ?? '';
-    setUnit(unit);
+    const product = props.products.find(product => product.value === selectedProduct);
+    if (product) {
+      setUnit(product.unit);
+      setPrice(product.price);
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedProduct])
 
-  const handleChangeProduct = (value) => {
-      const unit = props.products.find(product => product.value === value)?.unit ?? '';
-      setUnit(unit);
+  const handleChangeProduct = value => {
+    console.log(value)
+    const product = props.products.find(product => product.value === value);
+    if (product) {
+      setUnit(product.unit);
+      setPrice(product.price);
+    }
+  }
+
+  const handleChangeQty = e => {
+    const totalPrice = e.target.value * price;
+    props.form.setFieldsValue({ totalPrice });
   }
 
   return (
@@ -118,9 +131,10 @@ const TransactionForm = (props) => {
         rules={[
           { required: true, message: 'Jumlah dibutuhkan' }
         ]}
+        onChange={handleChangeQty}
       >
         <Input 
-          type="number" addonAfter={unit} />
+          type="number" min={0} addonAfter={unit} />
       </Form.Item>
 
       <Form.Item 
