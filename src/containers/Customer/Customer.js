@@ -1,41 +1,84 @@
 import React, { useEffect, useState } from 'react';
 import useDebounce from '../../hooks/useDebounce/useDebounce';
-import { Button, Form, Input, Modal, Popover, Space, Table } from 'antd';
+import { Button, Form, Input, message, Modal, Popover, Space, Table } from 'antd';
 import { DeleteOutlined, ExclamationCircleOutlined, FormOutlined } from '@ant-design/icons';
 import PageHeader from '../../components/PageHeader/PageHeader';
 import CustomerForm from '../../components/Form/CustomerForm/CustomerForm';
 import PageBackground from '../../components/PageBackground/PageBackground';
+import { destroyCustomer, indexCustomer, showCustomer, storeCustomer, updateCustomer } from '../../services/customers';
 
 const Customer = (props) => {
+  const [dataSource, setDataSource] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [query, setQuery] = useState({
+    page: 1,
+    perPage: 10,
+    sortKey: 'id',
+    sortOrder: 'asc',
+    paginate: true,
+    search: ''
+  });
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0
+  });
+
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm, 800);
 
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const [formLoading, setFormLoading] = useState(false);
   const [visibleCreate, setVisibleCreate] = useState(false);
   const [visibleEdit, setVisibleEdit] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
   
   const [createForm] = Form.useForm();
   const [editForm] = Form.useForm();
 
-  const dataSource = [
-    {
-        id: 1,
-        name: 'John Doe',
-        email: 'johndoe@example.com',
-        phoneNumber: '081244556677',
-        address: 'Jl. Sukamiskin No.7'
-    },
-    {
-        id: 2,
-        name: 'Jane Doe',
-        email: 'janedoe@example.com',
-        phoneNumber: '081244556688',
-        address: 'Jl. Sukamiskin No.9'
-    }
-  ];
+  // const dataSource = [
+  //   {
+  //       id: 1,
+  //       name: 'John Doe',
+  //       email: 'johndoe@example.com',
+  //       phone_number: '081244556677',
+  //       address: 'Jl. Sukamiskin No.7'
+  //   },
+  //   {
+  //       id: 2,
+  //       name: 'Jane Doe',
+  //       email: 'janedoe@example.com',
+  //       phone_number: '081244556688',
+  //       address: 'Jl. Sukamiskin No.9'
+  //   }
+  // ];
 
   useEffect(() => {
-    console.log('searching ...')
+    getData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query])
+
+  const getData = () => {
+    setLoading(true);
+    indexCustomer(query)
+      .then(res => {
+        setDataSource(res.data.results);
+        setPagination({
+          current: res.data.pagination.page,
+          pageSize: res.data.pagination.pageSize,
+          total: res.data.pagination.total
+        })
+        setLoading(false);
+      })
+      .catch(err => console.error(err));
+  }
+
+  useEffect(() => {
+    setQuery({
+      ...query,
+      search: debouncedSearchTerm
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearchTerm])
 
   const handleSearch = (e) => {
@@ -43,43 +86,66 @@ const Customer = (props) => {
   }
 
   const handleCreateCustomer = (values) => {
-    console.log(values);
     setConfirmLoading(true);
-    setTimeout(() => {
-      setVisibleCreate(false);
-      setConfirmLoading(false);
-    }, 2000);
+    storeCustomer(values)
+      .then(res => {
+        setVisibleCreate(false);
+        setConfirmLoading(false);
+        createForm.resetFields();
+        message.success('Berhasil membuat customer');
+        getData();
+      });
   }
 
   const handleClickEdit = (id) => () => {
-    editForm.setFieldsValue(dataSource.find(data => data.id === id));
+    setSelectedId(id);
+    editForm.resetFields();
+    setFormLoading(true);
+    showCustomer(id)
+      .then(res => {
+        editForm.setFieldsValue(res.data);
+        setFormLoading(false);
+      });
     setVisibleEdit(true);
   }
   
   const handleEditCustomer = (values) => {
-    console.log(values);
     setConfirmLoading(true);
-    setTimeout(() => {
-      setVisibleEdit(false);
-      setConfirmLoading(false);
-    }, 2000);
+    updateCustomer(selectedId, values)
+      .then(res => {
+        setVisibleEdit(false);
+        setConfirmLoading(false);
+        setSelectedId(null);
+        message.success('Berhasil edit customer');
+      });
   }
   
   const handleClickDelete = (id) => () => {
     const data = dataSource.find(data => data.id === id);
 
     Modal.confirm({
-      title: 'Hapus pelanggan "' + data.name + '"?',
+      title: 'Hapus customer "' + data.name + '"?',
       icon: <ExclamationCircleOutlined />,
-      content: 'Data pelanggan ini akan dihapus secara permanen',
+      content: 'Data customer ini akan dihapus secara permanen',
       onOk: () => (
-        new Promise((resolve, reject) => {
-          setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
-        }).catch(() => console.log('Oops errors!'))
-      ),
-      onCancel: () => {
-        console.log('canceled');
-      }
+        destroyCustomer(id).then(() => {
+          message.success('Berhasil menghapus customer');
+          getData();
+        })
+      )
+    });
+  }
+
+  const handleChangeTable = (pagination, filters, sorter, extra) => {
+    const sort = {
+      sortKey: sorter.order ? sorter.columnKey : 'id',
+      sortOrder: sorter.order === 'descend' ? 'desc' : 'asc'
+    };
+
+    setQuery({
+      ...query,
+      ...sort,
+      page: pagination.current
     });
   }
 
@@ -88,23 +154,25 @@ const Customer = (props) => {
         title: 'Nama Customer',
         key: 'name',
         dataIndex: 'name',
-        sorter: true,
-        sortDirections: ['descend', 'ascend'],
+        sorter: true
     },
     {
         title: 'Email',
         key: 'email',
-        dataIndex: 'email'
+        dataIndex: 'email',
+        sorter: true
     },
     {
         title: 'Nomor Telepon',
-        key: 'phoneNumber',
-        dataIndex: 'phoneNumber'
+        key: 'phone_number',
+        dataIndex: 'phone_number',
+        sorter: true
     },
     {
         title: 'Alamat',
         key: 'address',
-        dataIndex: 'address'
+        dataIndex: 'address',
+        sorter: true
     },
     {
         title: 'Actions',
@@ -128,10 +196,6 @@ const Customer = (props) => {
         )
     }
   ];
-  
-  const handleChangeTable = (pagination, filters, sorter, extra) => {
-    console.log('table', pagination, filters, sorter, extra);
-  }
 
   return (
     <PageBackground>
@@ -140,7 +204,13 @@ const Customer = (props) => {
         <Button type="primary" onClick={() => setVisibleCreate(true)}>Create</Button>
       </PageHeader>
 
-      <Table dataSource={dataSource} columns={columns} rowKey="id" onChange={handleChangeTable} />
+      <Table 
+        dataSource={dataSource} 
+        columns={columns} 
+        rowKey="id" 
+        pagination={pagination}
+        onChange={handleChangeTable}
+        loading={loading} />
       
       <CustomerForm
         form={createForm}
@@ -158,7 +228,8 @@ const Customer = (props) => {
         title="Edit Customer"
         onCreate={handleEditCustomer}
         onCancel={() => setVisibleEdit(false)}
-        confirmLoading={confirmLoading} />
+        confirmLoading={confirmLoading}
+        formLoading={formLoading} />
     </PageBackground>
   );
 }

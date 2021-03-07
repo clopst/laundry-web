@@ -89,13 +89,14 @@ const UserManagement = (props) => {
   }
 
   const handleCreateUser = (values) => {
-    console.log(values);
     setConfirmLoading(true);
     storeUser(values)
       .then(res => {
         setVisibleCreate(false);
         setConfirmLoading(false);
+        createForm.resetFields();
         message.success('Berhasil membuat user');
+        getData();
       });
   }
 
@@ -142,9 +143,9 @@ const UserManagement = (props) => {
     const data = dataSource.find(data => data.id === id);
 
     Modal.confirm({
-      title: 'Delete user "' + data.name + '"?',
+      title: 'Hapus user "' + data.name + '"?',
       icon: <ExclamationCircleOutlined />,
-      content: 'This user will be deleted permanently',
+      content: 'Data user ini akan dihapus secara permanen',
       onOk: () => (
         destroyUser(id).then(() => {
           message.success('Berhasil menghapus user');

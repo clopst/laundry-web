@@ -26,7 +26,7 @@ const CustomerForm = (props) => (
     </Form.Item>
 
     <Form.Item 
-      name="phoneNumber"
+      name="phone_number"
       label="Nomor Telepon"
       rules={[
         { required: true, message: 'Nomor telepon dibutuhkan' }

@@ -9,7 +9,7 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import './SiderLayout.css';
-import { NavLink, Route, withRouter } from 'react-router-dom';
+import { NavLink, Route, Switch, withRouter } from 'react-router-dom';
 import UserManagement from '../UserManagement/UserManagement';
 import Customer from '../Customer/Customer';
 import Outlet from '../Outlet/Outlet';
@@ -102,14 +102,16 @@ const SiderLayout = (props) => {
           </Breadcrumb> */}
           {/* <div className="site-layout-background" style={{ padding: 24, height: '100%' }}>
           </div> */}
-          
-          <Route path="/" exact component={Dashboard} />
-          <Route path="/users" exact component={UserManagement} />
-          <Route path="/customers" exact component={Customer} />
-          <Route path="/outlets" exact component={Outlet} />
-          <Route path="/products" exact component={Product} />
-          <Route path="/transactions" exact component={Transaction} />
-          <Route path="/profile" exact component={Profile} />
+
+          <Switch>
+            <Route path="/" exact component={Dashboard} />
+            <Route path="/users" exact component={UserManagement} />
+            <Route path="/customers" exact component={Customer} />
+            <Route path="/outlets" exact component={Outlet} />
+            <Route path="/products" exact component={Product} />
+            <Route path="/transactions" exact component={Transaction} />
+            <Route path="/profile" exact component={Profile} />
+          </Switch>
         </Content>
 
         <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
