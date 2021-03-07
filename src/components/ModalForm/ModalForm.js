@@ -1,5 +1,5 @@
 import React from 'react'
-import { Form, Modal } from 'antd';
+import { Form, Modal, Spin } from 'antd';
 
 const ModalForm = (props) => {
   // const [form] = Form.useForm();
@@ -24,15 +24,17 @@ const ModalForm = (props) => {
           });
       }}
     >
-      <Form
-        form={form}
-        layout="vertical"
-        name={props.formName}
-        onFieldsChange={props.onFieldsChange}
-        onValuesChange={props.onValuesChange}
-      >
-        {props.children}
-      </Form>
+      <Spin spinning={props.formLoading ?? false}>
+        <Form
+          form={form}
+          layout="vertical"
+          name={props.formName}
+          onFieldsChange={props.onFieldsChange}
+          onValuesChange={props.onValuesChange}
+        >
+          {props.children}
+        </Form>
+      </Spin>
     </Modal>
   );
 }

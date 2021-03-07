@@ -1,17 +1,35 @@
 import React, { useEffect, useState } from 'react';
 import useDebounce from '../../hooks/useDebounce/useDebounce';
-import { Button, Form, Input, Modal, Popover, Space, Table } from 'antd';
+import { Button, Form, Input, message, Modal, Popover, Space, Table } from 'antd';
 import { DeleteOutlined, ExclamationCircleOutlined, FormOutlined, LockOutlined } from '@ant-design/icons';
 import PageHeader from '../../components/PageHeader/PageHeader';
 import UserForm from '../../components/Form/UserForm/UserForm';
 import ChangePasswordUserForm from '../../components/Form/UserForm/ChangePasswordUserForm/ChangePasswordUserForm';
 import PageBackground from '../../components/PageBackground/PageBackground';
+import { changePasswordUser, destroyUser, indexUser, showUser, storeUser, updateUser } from '../../services/users';
 
 const UserManagement = (props) => {
+  const [dataSource, setDataSource] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [query, setQuery] = useState({
+    page: 1,
+    perPage: 10,
+    sortKey: 'id',
+    sortOrder: 'asc',
+    paginate: true,
+    search: ''
+  });
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0
+  });
+
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm, 800);
 
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const [formLoading, setFormLoading] = useState(false);
   const [visibleCreate, setVisibleCreate] = useState(false);
   const [visibleEdit, setVisibleEdit] = useState(false);
   const [visibleChangePassword, setVisibleChangePassword] = useState(false);
@@ -21,25 +39,49 @@ const UserManagement = (props) => {
   const [editForm] = Form.useForm();
   const [changePasswordForm] = Form.useForm();
 
-  const dataSource = [
-    {
-        id: 1,
-        name: 'John Doe',
-        username: 'johndoe',
-        email: 'johndoe@example.com',
-        role: 'admin'
-    },
-    {
-        id: 2,
-        name: 'Jane Doe',
-        username: 'janedoe',
-        email: 'janedoe@example.com',
-        role: 'admin'
-    }
-  ];
+  // const dataSource = [
+  //   {
+  //       id: 1,
+  //       name: 'John Doe',
+  //       username: 'johndoe',
+  //       email: 'johndoe@example.com',
+  //       role: 'admin'
+  //   },
+  //   {
+  //       id: 2,
+  //       name: 'Jane Doe',
+  //       username: 'janedoe',
+  //       email: 'janedoe@example.com',
+  //       role: 'admin'
+  //   }
+  // ];
+  
+  useEffect(() => {
+    getData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query])
+
+  const getData = () => {
+    setLoading(true);
+    indexUser(query)
+      .then(res => {
+        setDataSource(res.data.results);
+        setPagination({
+          current: res.data.pagination.page,
+          pageSize: res.data.pagination.pageSize,
+          total: res.data.pagination.total
+        })
+        setLoading(false);
+      })
+      .catch(err => console.error(err));
+  }
 
   useEffect(() => {
-    console.log('searching ...')
+    setQuery({
+      ...query,
+      search: debouncedSearchTerm
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearchTerm])
 
   const handleSearch = (e) => {
@@ -49,24 +91,35 @@ const UserManagement = (props) => {
   const handleCreateUser = (values) => {
     console.log(values);
     setConfirmLoading(true);
-    setTimeout(() => {
-      setVisibleCreate(false);
-      setConfirmLoading(false);
-    }, 2000);
+    storeUser(values)
+      .then(res => {
+        setVisibleCreate(false);
+        setConfirmLoading(false);
+        message.success('Berhasil membuat user');
+      });
   }
 
   const handleClickEdit = (id) => () => {
-    editForm.setFieldsValue(dataSource.find(data => data.id === id));
+    setSelectedId(id);
+    editForm.resetFields();
+    setFormLoading(true);
+    showUser(id)
+      .then(res => {
+        editForm.setFieldsValue(res.data);
+        setFormLoading(false);
+      });
     setVisibleEdit(true);
   }
   
   const handleEditUser = (values) => {
-    console.log(values);
     setConfirmLoading(true);
-    setTimeout(() => {
-      setVisibleEdit(false);
-      setConfirmLoading(false);
-    }, 2000);
+    updateUser(selectedId, values)
+      .then(res => {
+        setVisibleEdit(false);
+        setConfirmLoading(false);
+        setSelectedId(null);
+        message.success('Berhasil edit user');
+      });
   }
   
   const handleClickChangePassword = (id) => () => {
@@ -75,30 +128,42 @@ const UserManagement = (props) => {
   }
 
   const handleChangePasswordUser = (values) => {
-    console.log(values, selectedId);
     setConfirmLoading(true);
-    setTimeout(() => {
-      setVisibleChangePassword(false);
-      setConfirmLoading(false);
-      setSelectedId(null);
-    }, 2000);
+    changePasswordUser(selectedId, values)
+      .then(res => {
+        setVisibleChangePassword(false);
+        setConfirmLoading(false);
+        setSelectedId(null);
+        message.success('Berhasil mengubah password user');
+      });
   }
   
   const handleClickDelete = (id) => () => {
     const data = dataSource.find(data => data.id === id);
 
     Modal.confirm({
-      title: 'Delete user ' + data.name + '?',
+      title: 'Delete user "' + data.name + '"?',
       icon: <ExclamationCircleOutlined />,
       content: 'This user will be deleted permanently',
       onOk: () => (
-        new Promise((resolve, reject) => {
-          setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
-        }).catch(() => console.log('Oops errors!'))
-      ),
-      onCancel: () => {
-        console.log('canceled');
-      }
+        destroyUser(id).then(() => {
+          message.success('Berhasil menghapus user');
+          getData();
+        })
+      )
+    });
+  }
+  
+  const handleChangeTable = (pagination, filters, sorter, extra) => {
+    const sort = {
+      sortKey: sorter.order ? sorter.columnKey : 'id',
+      sortOrder: sorter.order === 'descend' ? 'desc' : 'asc'
+    };
+
+    setQuery({
+      ...query,
+      ...sort,
+      page: pagination.current
     });
   }
 
@@ -107,23 +172,25 @@ const UserManagement = (props) => {
         title: 'Nama',
         key: 'name',
         dataIndex: 'name',
-        sorter: true,
-        sortDirections: ['descend', 'ascend'],
+        sorter: true
     },
     {
         title: 'Username',
         key: 'username',
-        dataIndex: 'username'
+        dataIndex: 'username',
+        sorter: true
     },
     {
         title: 'Email',
         key: 'email',
-        dataIndex: 'email'
+        dataIndex: 'email',
+        sorter: true
     },
     {
         title: 'Role',
         key: 'role',
-        dataIndex: 'role'
+        dataIndex: 'role',
+        sorter: true
     },
     {
         title: 'Actions',
@@ -153,10 +220,6 @@ const UserManagement = (props) => {
         )
     }
   ];
-  
-  const handleChangeTable = (pagination, filters, sorter, extra) => {
-    console.log('table', pagination, filters, sorter, extra);
-  }
 
   return (
     <PageBackground>
@@ -165,7 +228,13 @@ const UserManagement = (props) => {
         <Button type="primary" onClick={() => setVisibleCreate(true)}>Create</Button>
       </PageHeader>
 
-      <Table dataSource={dataSource} columns={columns} rowKey="id" onChange={handleChangeTable} />
+      <Table 
+        dataSource={dataSource} 
+        columns={columns} 
+        rowKey="id" 
+        pagination={pagination}
+        onChange={handleChangeTable}
+        loading={loading} />
       
       <UserForm
         form={createForm}
@@ -217,7 +286,8 @@ const UserManagement = (props) => {
         title="Edit User"
         onCreate={handleEditUser}
         onCancel={() => setVisibleEdit(false)}
-        confirmLoading={confirmLoading} />
+        confirmLoading={confirmLoading}
+        formLoading={formLoading} />
 
       <ChangePasswordUserForm
         form={changePasswordForm}

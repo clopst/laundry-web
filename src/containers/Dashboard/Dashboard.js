@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, Col, Row, Table, Typography } from 'antd';
 import { ShopOutlined, ShoppingOutlined, SkinOutlined, TeamOutlined } from '@ant-design/icons';
-import { currencyFormatter } from '../../helpers/Currency';
+import { currencyFormatter } from '../../helpers/currency';
 
 const { Title } = Typography;
 
@@ -34,7 +34,7 @@ const Dashboard = (props) => {
   ];
 
   const renderCards = cards.map(card => (
-    <Col className="gutter-row" span={6}>
+    <Col key={card.title} className="gutter-row" span={6}>
       <Card title={card.title}>
         <Row>
           <Col flex="auto">

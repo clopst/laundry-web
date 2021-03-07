@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, Input, InputNumber, Select } from 'antd';
 import ModalForm from '../../ModalForm/ModalForm';
-import { currencyFormatter, currencyParser } from '../../../helpers/Currency';
+import { currencyFormatter, currencyParser } from '../../../helpers/currency';
 
 const selectFilterOption =  (input, option) => (
   option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0

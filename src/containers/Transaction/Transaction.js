@@ -4,7 +4,7 @@ import { Button, Form, Input, Modal, Popover, Select, Space, Table } from 'antd'
 import { DeleteOutlined, ExclamationCircleOutlined, FormOutlined } from '@ant-design/icons';
 import PageHeader from '../../components/PageHeader/PageHeader';
 import TransactionForm from '../../components/Form/TransactionForm/TransactionForm';
-import { currencyFormatter } from '../../helpers/Currency';
+import { currencyFormatter } from '../../helpers/currency';
 import PageBackground from '../../components/PageBackground/PageBackground';
 
 const TRANSACTION_STATUS = [
