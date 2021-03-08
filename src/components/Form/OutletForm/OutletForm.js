@@ -18,7 +18,7 @@ const OutletForm = (props) => (
       <Input />
     </Form.Item>
     
-    <Form.Item 
+    {/* <Form.Item 
       name="code" 
       label="Kode Outlet"
       rules={[
@@ -26,10 +26,10 @@ const OutletForm = (props) => (
       ]}
     >
       <Input />
-    </Form.Item>
+    </Form.Item> */}
 
     <Form.Item 
-      name="phoneNumber"
+      name="phone_number"
       label="Nomor Telepon"
       rules={[
         { required: true, message: 'Nomor telepon dibutuhkan' }
@@ -49,7 +49,7 @@ const OutletForm = (props) => (
     </Form.Item>
     
     <Form.Item 
-      name="owners"
+      name="owner_ids"
       label="Owner"
     >
       <Select
@@ -66,7 +66,7 @@ const OutletForm = (props) => (
     </Form.Item>
     
     <Form.Item 
-      name="cashiers"
+      name="cashier_ids"
       label="Kasir"
     >
       <Select

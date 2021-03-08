@@ -1,88 +1,156 @@
 import React, { useEffect, useState } from 'react';
 import useDebounce from '../../hooks/useDebounce/useDebounce';
-import { Button, Form, Input, Modal, Popover, Space, Table } from 'antd';
+import { Button, Form, Input, message, Modal, Popover, Space, Table } from 'antd';
 import { DeleteOutlined, ExclamationCircleOutlined, FormOutlined } from '@ant-design/icons';
 import PageHeader from '../../components/PageHeader/PageHeader';
 import OutletForm from '../../components/Form/OutletForm/OutletForm';
 import PageBackground from '../../components/PageBackground/PageBackground';
+import { destroyOutlet, getDropdownsOutlet, indexOutlet, showOutlet, storeOutlet, updateOutlet } from '../../services/outlets';
 
 const Outlet = (props) => {
+  const [dataSource, setDataSource] = useState([]);
+  const [dropdowns, setDropdowns] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [query, setQuery] = useState({
+    page: 1,
+    perPage: 10,
+    sortKey: 'id',
+    sortOrder: 'asc',
+    paginate: true,
+    search: ''
+  });
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0
+  });
+
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm, 800);
 
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const [formLoading, setFormLoading] = useState(false);
   const [visibleCreate, setVisibleCreate] = useState(false);
   const [visibleEdit, setVisibleEdit] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
   
   const [createForm] = Form.useForm();
   const [editForm] = Form.useForm();
 
-  const dataSource = [
-    {
-        id: 1,
-        name: 'Outlet Bandung',
-        phoneNumber: '081244556677',
-        address: 'Jl. Bandung Negara'
-    },
-    {
-        id: 2,
-        name: 'Outlet Jakarta',
-        phoneNumber: '081244556688',
-        address: 'Jl. Jakarta Negara'
-    }
-  ];
+  // const dataSource = [
+  //   {
+  //       id: 1,
+  //       name: 'Outlet Bandung',
+  //       phoneNumber: '081244556677',
+  //       address: 'Jl. Bandung Negara'
+  //   },
+  //   {
+  //       id: 2,
+  //       name: 'Outlet Jakarta',
+  //       phoneNumber: '081244556688',
+  //       address: 'Jl. Jakarta Negara'
+  //   }
+  // ];
 
-  const owners = [
-    {
-        value: 1,
-        label: 'John Doe'
-    },
-    {
-        value: 2,
-        label: 'Jane Doe'
-    }
-  ];
+  // const owners = [
+  //   {
+  //       value: 1,
+  //       label: 'John Doe'
+  //   },
+  //   {
+  //       value: 2,
+  //       label: 'Jane Doe'
+  //   }
+  // ];
 
-  const cashiers = [
-    {
-        value: 3,
-        label: 'Bobby Doe'
-    },
-    {
-        value: 4,
-        label: 'Albert Doe'
-    }
-  ];
+  // const cashiers = [
+  //   {
+  //       value: 3,
+  //       label: 'Bobby Doe'
+  //   },
+  //   {
+  //       value: 4,
+  //       label: 'Albert Doe'
+  //   }
+  // ];
 
   useEffect(() => {
-    console.log('searching ...')
+    getData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query])
+
+  const getData = () => {
+    setLoading(true);
+    indexOutlet(query)
+      .then(res => {
+        setDataSource(res.data.results);
+        setPagination({
+          current: res.data.pagination.page,
+          pageSize: res.data.pagination.pageSize,
+          total: res.data.pagination.total
+        })
+        setLoading(false);
+      })
+      .catch(err => console.error(err));
+  }
+
+  useEffect(() => {
+    setQuery({
+      ...query,
+      search: debouncedSearchTerm
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearchTerm])
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
   }
 
-  const handleCreateOutlet = (values) => {
-    console.log(values);
+  const handleClickCreate = () => {
+    setVisibleCreate(true);
+    setFormLoading(true);
+    getDropdownsOutlet()
+      .then(res => {
+        setDropdowns(res.data);
+        setFormLoading(false);
+      })
+  }
+
+  const handleCreate = (values) => {
     setConfirmLoading(true);
-    setTimeout(() => {
-      setVisibleCreate(false);
-      setConfirmLoading(false);
-    }, 2000);
+    storeOutlet(values)
+      .then(res => {
+        setVisibleCreate(false);
+        setConfirmLoading(false);
+        createForm.resetFields();
+        message.success('Berhasil membuat outlet');
+        getData();
+      });
   }
 
   const handleClickEdit = (id) => () => {
-    editForm.setFieldsValue(dataSource.find(data => data.id === id));
+    setSelectedId(id);
+    editForm.resetFields();
+    setFormLoading(true);
+    Promise.all([showOutlet(id), getDropdownsOutlet({ id })])
+      .then(res => {
+        editForm.setFieldsValue(res[0].data);
+        setDropdowns(res[1].data);
+        setFormLoading(false);
+      })
     setVisibleEdit(true);
   }
   
-  const handleEditOutlet = (values) => {
-    console.log(values);
+  const handleEdit = (values) => {
+    console.log(values)
     setConfirmLoading(true);
-    setTimeout(() => {
-      setVisibleEdit(false);
-      setConfirmLoading(false);
-    }, 2000);
+    updateOutlet(selectedId, values)
+      .then(res => {
+        setVisibleEdit(false);
+        setConfirmLoading(false);
+        setSelectedId(null);
+        message.success('Berhasil edit outlet');
+      });
   }
   
   const handleClickDelete = (id) => () => {
@@ -91,15 +159,26 @@ const Outlet = (props) => {
     Modal.confirm({
       title: 'Hapus outlet "' + data.name + '"?',
       icon: <ExclamationCircleOutlined />,
-      content: 'Outlet ini akan dihapus secara permanen',
+      content: 'Data outlet ini akan dihapus secara permanen',
       onOk: () => (
-        new Promise((resolve, reject) => {
-          setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
-        }).catch(() => console.log('Oops errors!'))
-      ),
-      onCancel: () => {
-        console.log('canceled');
-      }
+        destroyOutlet(id).then(() => {
+          message.success('Berhasil menghapus outlet');
+          getData();
+        })
+      )
+    });
+  }
+
+  const handleChangeTable = (pagination, filters, sorter, extra) => {
+    const sort = {
+      sortKey: sorter.order ? sorter.columnKey : 'id',
+      sortOrder: sorter.order === 'descend' ? 'desc' : 'asc'
+    };
+
+    setQuery({
+      ...query,
+      ...sort,
+      page: pagination.current
     });
   }
 
@@ -108,18 +187,19 @@ const Outlet = (props) => {
         title: 'Nama Outlet',
         key: 'name',
         dataIndex: 'name',
-        sorter: true,
-        sortDirections: ['descend', 'ascend'],
+        sorter: true
     },
     {
         title: 'Nomor Telepon',
-        key: 'phoneNumber',
-        dataIndex: 'phoneNumber'
+        key: 'phone_number',
+        dataIndex: 'phone_number',
+        sorter: true
     },
     {
         title: 'Alamat',
         key: 'address',
-        dataIndex: 'address'
+        dataIndex: 'address',
+        sorter: true
     },
     {
         title: 'Actions',
@@ -143,41 +223,45 @@ const Outlet = (props) => {
         )
     }
   ];
-  
-  const handleChangeTable = (pagination, filters, sorter, extra) => {
-    console.log('table', pagination, filters, sorter, extra);
-  }
 
   return (
     <PageBackground>
       <PageHeader title="Outlets">
         <Input placeholder="Search ..." onChange={handleSearch} />
-        <Button type="primary" onClick={() => setVisibleCreate(true)}>Create</Button>
+        <Button type="primary" onClick={handleClickCreate}>Create</Button>
       </PageHeader>
 
-      <Table dataSource={dataSource} columns={columns} rowKey="id" onChange={handleChangeTable} />
+      <Table 
+        dataSource={dataSource} 
+        columns={columns} 
+        rowKey="id" 
+        pagination={pagination}
+        onChange={handleChangeTable}
+        loading={loading} />
       
       <OutletForm
         form={createForm}
         formName="outlet-create-form"
         visible={visibleCreate}
         title="Create Outlet"
-        onCreate={handleCreateOutlet}
+        onCreate={handleCreate}
         onCancel={() => setVisibleCreate(false)}
         confirmLoading={confirmLoading}
-        owners={owners}
-        cashiers={cashiers} />
+        formLoading={formLoading}
+        owners={dropdowns.owners ?? []}
+        cashiers={dropdowns.cashiers ?? []} />
       
       <OutletForm
         form={editForm}
         formName="outlet-edit-form"
         visible={visibleEdit}
         title="Edit Outlet"
-        onCreate={handleEditOutlet}
+        onCreate={handleEdit}
         onCancel={() => setVisibleEdit(false)}
         confirmLoading={confirmLoading}
-        owners={owners}
-        cashiers={cashiers} />
+        formLoading={formLoading}
+        owners={dropdowns.owners ?? []}
+        cashiers={dropdowns.cashiers ?? []} />
     </PageBackground>
   );
 }

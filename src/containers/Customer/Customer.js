@@ -85,7 +85,7 @@ const Customer = (props) => {
     setSearchTerm(e.target.value);
   }
 
-  const handleCreateCustomer = (values) => {
+  const handleCreate = (values) => {
     setConfirmLoading(true);
     storeCustomer(values)
       .then(res => {
@@ -109,7 +109,7 @@ const Customer = (props) => {
     setVisibleEdit(true);
   }
   
-  const handleEditCustomer = (values) => {
+  const handleEdit = (values) => {
     setConfirmLoading(true);
     updateCustomer(selectedId, values)
       .then(res => {
@@ -217,7 +217,7 @@ const Customer = (props) => {
         formName="customer-create-form"
         visible={visibleCreate}
         title="Create Customer"
-        onCreate={handleCreateCustomer}
+        onCreate={handleCreate}
         onCancel={() => setVisibleCreate(false)}
         confirmLoading={confirmLoading} />
       
@@ -226,7 +226,7 @@ const Customer = (props) => {
         formName="customer-edit-form"
         visible={visibleEdit}
         title="Edit Customer"
-        onCreate={handleEditCustomer}
+        onCreate={handleEdit}
         onCancel={() => setVisibleEdit(false)}
         confirmLoading={confirmLoading}
         formLoading={formLoading} />

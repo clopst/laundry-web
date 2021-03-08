@@ -27,7 +27,7 @@ const Product = (props) => {
         outlet_id: null
     },
     {
-        id: 1,
+        id: 2,
         name: 'Bed Cover',
         unit: 'pcs',
         price: 35000,

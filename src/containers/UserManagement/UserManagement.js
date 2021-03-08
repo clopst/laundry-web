@@ -88,7 +88,7 @@ const UserManagement = (props) => {
     setSearchTerm(e.target.value);
   }
 
-  const handleCreateUser = (values) => {
+  const handleCreate = (values) => {
     setConfirmLoading(true);
     storeUser(values)
       .then(res => {
@@ -112,7 +112,7 @@ const UserManagement = (props) => {
     setVisibleEdit(true);
   }
   
-  const handleEditUser = (values) => {
+  const handleEdit = (values) => {
     setConfirmLoading(true);
     updateUser(selectedId, values)
       .then(res => {
@@ -128,7 +128,7 @@ const UserManagement = (props) => {
     setVisibleChangePassword(true);
   }
 
-  const handleChangePasswordUser = (values) => {
+  const handleChangePassword = (values) => {
     setConfirmLoading(true);
     changePasswordUser(selectedId, values)
       .then(res => {
@@ -242,7 +242,7 @@ const UserManagement = (props) => {
         formName="user-create-form"
         visible={visibleCreate}
         title="Create User"
-        onCreate={handleCreateUser}
+        onCreate={handleCreate}
         onCancel={() => setVisibleCreate(false)}
         confirmLoading={confirmLoading}
       >
@@ -285,7 +285,7 @@ const UserManagement = (props) => {
         formName="user-edit-form"
         visible={visibleEdit}
         title="Edit User"
-        onCreate={handleEditUser}
+        onCreate={handleEdit}
         onCancel={() => setVisibleEdit(false)}
         confirmLoading={confirmLoading}
         formLoading={formLoading} />
@@ -293,7 +293,7 @@ const UserManagement = (props) => {
       <ChangePasswordUserForm
         form={changePasswordForm}
         visible={visibleChangePassword}
-        onCreate={handleChangePasswordUser}
+        onCreate={handleChangePassword}
         onCancel={() => setVisibleChangePassword(false)}
         confirmLoading={confirmLoading} />
     </PageBackground>

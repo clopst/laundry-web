@@ -118,8 +118,8 @@ const Dashboard = (props) => {
       <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
         {renderCards}
         <Col span={24} style={{ marginTop: 16, minHeight: '200px' }}>
-          <Card>
-            <Card.Meta title="Daftar Transaksi Terbaru" description="10 Transaksi Terakhir" />
+          <Card title="Daftar Transaksi Terbaru">
+            <Card.Meta description="10 Transaksi Terakhir" />
             <Table 
               dataSource={dataSource} 
               columns={columns} 
