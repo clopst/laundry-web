@@ -7,6 +7,7 @@ import UserForm from '../../components/Form/UserForm/UserForm';
 import ChangePasswordUserForm from '../../components/Form/UserForm/ChangePasswordUserForm/ChangePasswordUserForm';
 import PageBackground from '../../components/PageBackground/PageBackground';
 import { changePasswordUser, destroyUser, indexUser, showUser, storeUser, updateUser } from '../../services/users';
+import handleError from '../../helpers/handleError';
 
 const UserManagement = (props) => {
   const [dataSource, setDataSource] = useState([]);
@@ -70,10 +71,10 @@ const UserManagement = (props) => {
           current: res.data.pagination.page,
           pageSize: res.data.pagination.pageSize,
           total: res.data.pagination.total
-        })
-        setLoading(false);
+        });
       })
-      .catch(err => console.error(err));
+      .catch(err => handleError(err))
+      .finally(() => setLoading(false));
   }
 
   useEffect(() => {
@@ -93,23 +94,28 @@ const UserManagement = (props) => {
     storeUser(values)
       .then(res => {
         setVisibleCreate(false);
-        setConfirmLoading(false);
         createForm.resetFields();
         message.success('Berhasil membuat user');
         getData();
-      });
+      })
+      .catch(err => handleError(err))
+      .finally(() => setConfirmLoading(false));
   }
 
   const handleClickEdit = (id) => () => {
     setSelectedId(id);
     editForm.resetFields();
+    setVisibleEdit(true);
     setFormLoading(true);
     showUser(id)
       .then(res => {
         editForm.setFieldsValue(res.data);
-        setFormLoading(false);
-      });
-    setVisibleEdit(true);
+      })
+      .catch(err => {
+        handleError(err);
+        setVisibleEdit(false);
+      })
+      .finally(() => setFormLoading(false));
   }
   
   const handleEdit = (values) => {
@@ -117,10 +123,12 @@ const UserManagement = (props) => {
     updateUser(selectedId, values)
       .then(res => {
         setVisibleEdit(false);
-        setConfirmLoading(false);
         setSelectedId(null);
         message.success('Berhasil edit user');
-      });
+        getData();
+      })
+      .catch(err => handleError(err))
+      .finally(() => setConfirmLoading(false));
   }
   
   const handleClickChangePassword = (id) => () => {
@@ -133,10 +141,11 @@ const UserManagement = (props) => {
     changePasswordUser(selectedId, values)
       .then(res => {
         setVisibleChangePassword(false);
-        setConfirmLoading(false);
         setSelectedId(null);
         message.success('Berhasil mengubah password user');
-      });
+      })
+      .catch(err => handleError(err))
+      .finally(() => setConfirmLoading(false));
   }
   
   const handleClickDelete = (id) => () => {
@@ -147,10 +156,12 @@ const UserManagement = (props) => {
       icon: <ExclamationCircleOutlined />,
       content: 'Data user ini akan dihapus secara permanen',
       onOk: () => (
-        destroyUser(id).then(() => {
-          message.success('Berhasil menghapus user');
-          getData();
-        })
+        destroyUser(id)
+          .then(() => {
+            message.success('Berhasil menghapus user');
+            getData();
+          })
+          .catch(err => handleError(err))
       )
     });
   }

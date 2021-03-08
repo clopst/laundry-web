@@ -6,6 +6,7 @@ import PageHeader from '../../components/PageHeader/PageHeader';
 import CustomerForm from '../../components/Form/CustomerForm/CustomerForm';
 import PageBackground from '../../components/PageBackground/PageBackground';
 import { destroyCustomer, indexCustomer, showCustomer, storeCustomer, updateCustomer } from '../../services/customers';
+import handleError from '../../helpers/handleError';
 
 const Customer = (props) => {
   const [dataSource, setDataSource] = useState([]);
@@ -68,9 +69,9 @@ const Customer = (props) => {
           pageSize: res.data.pagination.pageSize,
           total: res.data.pagination.total
         })
-        setLoading(false);
       })
-      .catch(err => console.error(err));
+      .catch(err => handleError(err))
+      .finally(() => setLoading(false));
   }
 
   useEffect(() => {
@@ -90,23 +91,28 @@ const Customer = (props) => {
     storeCustomer(values)
       .then(res => {
         setVisibleCreate(false);
-        setConfirmLoading(false);
         createForm.resetFields();
         message.success('Berhasil membuat customer');
         getData();
-      });
+      })
+      .catch(err => handleError(err))
+      .finally(() => setConfirmLoading(false));
   }
 
   const handleClickEdit = (id) => () => {
     setSelectedId(id);
     editForm.resetFields();
+    setVisibleEdit(true);
     setFormLoading(true);
     showCustomer(id)
       .then(res => {
         editForm.setFieldsValue(res.data);
-        setFormLoading(false);
-      });
-    setVisibleEdit(true);
+      })
+      .catch(err => {
+        handleError(err);
+        setVisibleEdit(false);
+      })
+      .finally(() => setFormLoading(false));
   }
   
   const handleEdit = (values) => {
@@ -114,10 +120,12 @@ const Customer = (props) => {
     updateCustomer(selectedId, values)
       .then(res => {
         setVisibleEdit(false);
-        setConfirmLoading(false);
         setSelectedId(null);
         message.success('Berhasil edit customer');
-      });
+        getData();
+      })
+      .catch(err => handleError(err))
+      .finally(() => setConfirmLoading(false));
   }
   
   const handleClickDelete = (id) => () => {
@@ -128,10 +136,12 @@ const Customer = (props) => {
       icon: <ExclamationCircleOutlined />,
       content: 'Data customer ini akan dihapus secara permanen',
       onOk: () => (
-        destroyCustomer(id).then(() => {
-          message.success('Berhasil menghapus customer');
-          getData();
-        })
+        destroyCustomer(id)
+          .then(() => {
+            message.success('Berhasil menghapus customer');
+            getData();
+          })
+          .catch(err => handleError(err))
       )
     });
   }

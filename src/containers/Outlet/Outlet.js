@@ -6,6 +6,7 @@ import PageHeader from '../../components/PageHeader/PageHeader';
 import OutletForm from '../../components/Form/OutletForm/OutletForm';
 import PageBackground from '../../components/PageBackground/PageBackground';
 import { destroyOutlet, getDropdownsOutlet, indexOutlet, showOutlet, storeOutlet, updateOutlet } from '../../services/outlets';
+import handleError from '../../helpers/handleError';
 
 const Outlet = (props) => {
   const [dataSource, setDataSource] = useState([]);
@@ -88,10 +89,10 @@ const Outlet = (props) => {
           current: res.data.pagination.page,
           pageSize: res.data.pagination.pageSize,
           total: res.data.pagination.total
-        })
-        setLoading(false);
+        });
       })
-      .catch(err => console.error(err));
+      .catch(err => handleError(err))
+      .finally(() => setLoading(false));
   }
 
   useEffect(() => {
@@ -112,8 +113,12 @@ const Outlet = (props) => {
     getDropdownsOutlet()
       .then(res => {
         setDropdowns(res.data);
-        setFormLoading(false);
       })
+      .catch(err => {
+        handleError(err);
+        setVisibleCreate(false);
+      })
+      .finally(() => setFormLoading(false));
   }
 
   const handleCreate = (values) => {
@@ -121,36 +126,43 @@ const Outlet = (props) => {
     storeOutlet(values)
       .then(res => {
         setVisibleCreate(false);
-        setConfirmLoading(false);
         createForm.resetFields();
         message.success('Berhasil membuat outlet');
         getData();
-      });
+      })
+      .catch(err => handleError(err))
+      .finally(() => setConfirmLoading(false));
   }
 
   const handleClickEdit = (id) => () => {
     setSelectedId(id);
     editForm.resetFields();
+    setVisibleEdit(true);
     setFormLoading(true);
+
     Promise.all([showOutlet(id), getDropdownsOutlet({ id })])
       .then(res => {
         editForm.setFieldsValue(res[0].data);
         setDropdowns(res[1].data);
-        setFormLoading(false);
       })
-    setVisibleEdit(true);
+      .catch(err => {
+        handleError(err);
+        setVisibleEdit(false);
+      })
+      .finally(() => setFormLoading(false));
   }
   
   const handleEdit = (values) => {
-    console.log(values)
     setConfirmLoading(true);
     updateOutlet(selectedId, values)
       .then(res => {
         setVisibleEdit(false);
-        setConfirmLoading(false);
         setSelectedId(null);
         message.success('Berhasil edit outlet');
-      });
+        getData();
+      })
+      .catch(err => handleError(err))
+      .finally(() => setConfirmLoading(false));
   }
   
   const handleClickDelete = (id) => () => {
@@ -161,10 +173,12 @@ const Outlet = (props) => {
       icon: <ExclamationCircleOutlined />,
       content: 'Data outlet ini akan dihapus secara permanen',
       onOk: () => (
-        destroyOutlet(id).then(() => {
-          message.success('Berhasil menghapus outlet');
-          getData();
-        })
+        destroyOutlet(id)
+          .then(() => {
+            message.success('Berhasil menghapus outlet');
+            getData();
+          })
+          .catch(err => handleError(err))
       )
     });
   }
