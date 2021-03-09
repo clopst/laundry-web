@@ -114,7 +114,7 @@ const SiderLayout = (props) => {
           </Switch>
         </Content>
 
-        <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
+        <Footer style={{ textAlign: 'center' }}>Laundry App ©2020 Created by Dimas Nurfauzi</Footer>
       </Layout>
     </Layout>
   )

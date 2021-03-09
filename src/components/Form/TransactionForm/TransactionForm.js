@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Input, InputNumber, Select } from 'antd';
+import { Form, Input, InputNumber, Select, Typography } from 'antd';
 import ModalForm from '../../ModalForm/ModalForm';
 import { currencyFormatter, currencyParser } from '../../../helpers/currency';
 
@@ -8,36 +8,80 @@ const selectFilterOption =  (input, option) => (
 );
 
 const TransactionForm = (props) => {
-  const { selectedProduct } = props;
+  const { selectedProduct, disabled } = props;
   const [unit, setUnit] = useState('');
   const [price, setPrice] = useState(0);
+  const [cashiers, setCashiers] = useState([]);
 
   useEffect(() => {
     const product = props.products.find(product => product.value === selectedProduct);
     if (product) {
       setUnit(product.unit);
       setPrice(product.price);
+    } else {
+      setUnit(0);
+      setPrice(0);
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedProduct])
 
   const handleChangeProduct = value => {
-    console.log(value)
     const product = props.products.find(product => product.value === value);
     if (product) {
       setUnit(product.unit);
       setPrice(product.price);
+      setTotalPrice(props.form.getFieldValue('qty') ?? 0, product.price);
+    } else {
+      setUnit(0);
+      setPrice(0);
+      setTotalPrice(props.form.getFieldValue('qty') ?? 0, 0);
     }
   }
 
   const handleChangeQty = e => {
-    const totalPrice = e.target.value * price;
-    props.form.setFieldsValue({ totalPrice });
+    setTotalPrice(e.target.value, price);
+  }
+
+  const setTotalPrice = (qty, price) => {
+    const totalPrice = qty * price;
+    props.form.setFieldsValue({ total_price: totalPrice });
+  }
+
+  const handleChangeOutlet = value => {
+    setCashiers(props.cashiers.filter(cashier => cashier.depends === value));
+    props.form.setFieldsValue({ cashier_id: null });
   }
 
   return (
     <ModalForm {...props}>
+      <Typography.Text style={{ 
+        display: disabled ? 'block' : 'none',
+        marginBottom: 16
+      }}>
+        Transaksi yang sudah melewati status "Sedang Proses" tidak dapat di-edit.
+      </Typography.Text>
+      <Form.Item 
+        name="outlet_id"
+        label="Outlet"
+        rules={[
+          { required: true, message: 'Produk laundry dibutuhkan' }
+        ]}
+      >
+        <Select
+          showSearch
+          filterOption={selectFilterOption}
+          placeholder="Pilih outlet untuk transaksi ini"
+          allowClear
+          onChange={handleChangeOutlet}
+          disabled={disabled}
+        >
+          {props.outlets.map(outlet => (
+            <Select.Option key={outlet.value} value={outlet.value}>{outlet.label}</Select.Option>
+          ))}
+        </Select>
+      </Form.Item>
+
       <Form.Item 
         name="cashier_id"
         label="Kasir"
@@ -50,8 +94,9 @@ const TransactionForm = (props) => {
           filterOption={selectFilterOption}
           placeholder="Pilih kasir untuk transaksi ini"
           allowClear
+          disabled={disabled}
         >
-          {props.cashiers.map(cashier => (
+          {cashiers.map(cashier => (
             <Select.Option key={cashier.value} value={cashier.value}>{cashier.label}</Select.Option>
           ))}
         </Select>
@@ -69,28 +114,10 @@ const TransactionForm = (props) => {
           filterOption={selectFilterOption}
           placeholder="Pilih customer untuk transaksi ini"
           allowClear
+          disabled={disabled}
         >
           {props.customers.map(cust => (
             <Select.Option key={cust.value} value={cust.value}>{cust.label}</Select.Option>
-          ))}
-        </Select>
-      </Form.Item>
-      
-      <Form.Item 
-        name="outlet_id"
-        label="Outlet"
-        rules={[
-          { required: true, message: 'Produk laundry dibutuhkan' }
-        ]}
-      >
-        <Select
-          showSearch
-          filterOption={selectFilterOption}
-          placeholder="Pilih outlet untuk transaksi ini"
-          allowClear
-        >
-          {props.outlets.map(outlet => (
-            <Select.Option key={outlet.value} value={outlet.value}>{outlet.label}</Select.Option>
           ))}
         </Select>
       </Form.Item>
@@ -102,7 +129,7 @@ const TransactionForm = (props) => {
           { required: true, message: 'Kode invoice dibutuhkan' }
         ]}
       >
-        <Input />
+        <Input disabled={disabled} />
       </Form.Item>
       
       <Form.Item 
@@ -118,6 +145,7 @@ const TransactionForm = (props) => {
           placeholder="Pilih produk untuk transaksi ini"
           allowClear
           onChange={handleChangeProduct}
+          disabled={disabled}
         >
           {props.products.map(product => (
             <Select.Option key={product.value} value={product.value}>{product.label}</Select.Option>
@@ -134,11 +162,14 @@ const TransactionForm = (props) => {
         onChange={handleChangeQty}
       >
         <Input 
-          type="number" min={0} addonAfter={unit} />
+          type="number" 
+          min={0} 
+          addonAfter={unit}
+          disabled={disabled} />
       </Form.Item>
 
       <Form.Item 
-        name="totalPrice"
+        name="total_price"
         label="Harga Total"
         rules={[
           { required: true, message: 'Harga total dibutuhkan' }
