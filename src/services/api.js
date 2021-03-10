@@ -5,8 +5,10 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json'
   },
-  // withCredentials: true
+  withCredentials: true
 });
+
+api.defaults.withCredentials = true;
 
 api.interceptors.response.use(axios.defaults, error => {
   const { message, response } = error;
@@ -30,7 +32,7 @@ api.interceptors.response.use(axios.defaults, error => {
     }
   }
 
-  return Promise.reject(new Error(err));
+  return Promise.reject(err);
 });
 
 // Source: https://stackoverflow.com/a/42483509

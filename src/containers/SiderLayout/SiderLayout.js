@@ -17,28 +17,34 @@ import Product from '../Product/Product';
 import Transaction from '../Transaction/Transaction';
 import Dashboard from '../Dashboard/Dashboard';
 import Profile from '../Profile/Profile';
+import { useAuthContext } from '../../context/AuthContext';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Text } = Typography;
 
-const profileMenu = (
-  <Menu>
-    <Text type="secondary" style={{ fontSize: 12, padding: 12 }}>Manage Account</Text>
-    <Menu.Item key="/">
-      <NavLink to="/profile">Profile</NavLink>
-    </Menu.Item>
-    <Menu.Divider />
-    <Menu.Item key="/logout">Logout</Menu.Item>
-  </Menu>
-);
-
 const SiderLayout = (props) => {
   const [collapsed, setCollapsed] = useState(false);
+  const { logout } = useAuthContext();
   
   const handleCollapse = value => {
     console.log(value);
     setCollapsed(value);
   }
+
+  const profileMenu = (
+    <Menu>
+      <Menu.ItemGroup 
+        title={
+          <Text type="secondary" style={{ fontSize: 12 }}>Manage Account</Text>
+        }
+      />
+      <Menu.Item key="/">
+        <NavLink to="/profile">Profile</NavLink>
+      </Menu.Item>
+      <Menu.Divider />
+      <Menu.Item key="/logout" onClick={logout}>Logout</Menu.Item>
+    </Menu>
+  );
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -92,7 +98,10 @@ const SiderLayout = (props) => {
         >
           <Typography.Title level={3} style={{ marginTop: 8 }}>Laundry App</Typography.Title>
           <Dropdown overlay={profileMenu} trigger={['click']}>
-            <Avatar size='default' icon={<UserOutlined />} style={{ cursor: 'pointer' }} />
+            <Avatar 
+              size='default' 
+              icon={<UserOutlined />} 
+              style={{ cursor: 'pointer' }} />
           </Dropdown>
         </Header>
         <Content style={{ margin: '16px' }}>

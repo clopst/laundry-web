@@ -1,4 +1,4 @@
-import { apiGet } from "./api";
+import { apiGet } from './api';
 
 const indexDashboard = params => apiGet('/api/dashboard', { params })
 

@@ -1,4 +1,4 @@
-import { apiDelete, apiGet, apiPostFormData, apiPut } from "./api";
+import { apiDelete, apiGet, apiPostFormData, apiPut } from './api';
 
 const indexProduct = params => apiGet('/api/products', { params });
 const storeProduct = data => apiPostFormData('/api/products', data);

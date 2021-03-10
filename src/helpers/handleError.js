@@ -1,4 +1,4 @@
-import { message } from "antd";
+import { message } from 'antd';
 
 const handleError = (error) => {
   if (error instanceof Object) {
