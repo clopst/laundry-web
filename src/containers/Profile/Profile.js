@@ -63,7 +63,7 @@ const Profile = (props) => {
       return (
         <Descriptions.Item label="Outlet">
           <ul style={{ padding: 0, margin: 0, listStyleType: 'none' }}>
-            {user.outlets.map(outlet => <li>{'- ' + outlet.name}</li>)}
+            {user.outlets.map(outlet => <li key={outlet.id}>{'- ' + outlet.name}</li>)}
           </ul>
         </Descriptions.Item>
       )
