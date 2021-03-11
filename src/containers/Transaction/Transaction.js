@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import useDebounce from '../../hooks/useDebounce/useDebounce';
 import { Button, Form, Input, message, Modal, Popover, Space, Table } from 'antd';
-import { DeleteOutlined, ExclamationCircleOutlined, FormOutlined, HighlightOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EyeOutlined, ExclamationCircleOutlined, FormOutlined, HighlightOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import 'dayjs/locale/id';
 import fileDownload from 'js-file-download';
@@ -24,6 +24,7 @@ import { TRANSACTION_STATUS, PAYMENT_STATUS } from '../../helpers/const';
 import ChangeStatusTransactionForm from '../../components/Form/TransactionForm/ChangeStatusTransactionForm/ChangeStatusTransactionForm';
 import { useAuthContext } from '../../context/AuthContext';
 import ExportTransactionForm from '../../components/Form/TransactionForm/ExportTransactionForm/ExportTransactionForm';
+import TransactionDetail from '../../components/Descriptions/TransactionDetail/TransactionDetail';
 
 const Transaction = (props) => {
   const { user } = useAuthContext();
@@ -50,14 +51,17 @@ const Transaction = (props) => {
 
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
+
   const [visibleCreate, setVisibleCreate] = useState(false);
   const [visibleEdit, setVisibleEdit] = useState(false);
   const [visibleChangeStatus, setVisibleChangeStatus] = useState(false);
   const [visibleExport, setVisibleExport] = useState(false);
+  const [visibleDetail, setVisibleDetail] = useState(false);
 
   const [selectedId, setSelectedId] = useState(null);
   const [status, setStatus] = useState(null);
   const [payment, setPayment] = useState(null);
+  const [transaction, setTransaction] = useState(null);
   
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [disabledEditForm, setDisabledEditForm] = useState(false);
@@ -323,6 +327,18 @@ const Transaction = (props) => {
       .finally(() => setConfirmLoading(false));
   }
 
+  const handleClickDetail = (id) => () => {
+    setVisibleDetail(true);
+    setFormLoading(true);
+    showTransaction(id)
+      .then(res => setTransaction(res.data))
+      .catch(err => {
+        handleError(err);
+        setVisibleDetail(false);
+      })
+      .finally(() => setFormLoading(false));
+  }
+
   const handleChangeTable = (pagination, filters, sorter, extra) => {
     const sort = {
       sortKey: sorter.order ? sorter.columnKey : 'id',
@@ -336,7 +352,7 @@ const Transaction = (props) => {
     });
   }
 
-  const columnList = [
+  const columns = [
     {
         title: 'Tanggal Transaksi',
         key: 'date',
@@ -396,38 +412,48 @@ const Transaction = (props) => {
         key: 'actions',
         render: (text, record) => (
           <Space size="middle">
-            <Popover content="Ubah Status Transaksi">
+            <Popover content="Lihat Detail">
               <Button 
                 type="default" 
-                icon={<HighlightOutlined />} 
-                onClick={handleClickChangeStatus(record.id)} />
+                icon={<EyeOutlined />} 
+                onClick={handleClickDetail(record.id)} />
             </Popover>
-            <Popover content="Edit">
-              <Button 
-                type="default" 
-                icon={<FormOutlined />} 
-                onClick={handleClickEdit(record.id)} />
-            </Popover>
-            <Popover content="Delete">
-              <Button 
-                type="default" 
-                danger
-                icon={<DeleteOutlined />}
-                onClick={handleClickDelete(record.id)} />
-            </Popover>
+            {user?.role !== 'owner' &&
+              <React.Fragment>
+                <Popover content="Ubah Status Transaksi">
+                  <Button 
+                    type="default" 
+                    icon={<HighlightOutlined />} 
+                    onClick={handleClickChangeStatus(record.id)} />
+                </Popover>
+                <Popover content="Edit">
+                  <Button 
+                    type="default" 
+                    icon={<FormOutlined />} 
+                    onClick={handleClickEdit(record.id)} />
+                </Popover>
+                <Popover content="Delete">
+                  <Button 
+                    type="default" 
+                    danger
+                    icon={<DeleteOutlined />}
+                    onClick={handleClickDelete(record.id)} />
+                </Popover>
+              </React.Fragment>
+            }
           </Space>
         )
     }
   ];
 
-  const [columns, setColumns] = useState(columnList);
+  // const [columns, setColumns] = useState(columnList);
 
-  useEffect(() => {
-    if (user?.role === 'owner') {
-      setColumns(columnList.filter(col => col.key !== 'actions'));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user])
+  // useEffect(() => {
+  //   if (user?.role === 'owner') {
+  //     setColumns(columnList.filter(col => col.key !== 'actions'));
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [user])
 
   return (
     <PageBackground>
@@ -499,6 +525,19 @@ const Transaction = (props) => {
         confirmLoading={confirmLoading}
         formLoading={formLoading}
         outlets={dropdowns.outlets ?? []} />
+
+      <TransactionDetail 
+        visible={visibleDetail}
+        data={transaction}
+        loading={formLoading}
+        onOk={() => {
+          setVisibleDetail(false);
+          setTransaction(null);
+        }}
+        onCancel={() => {
+          setVisibleDetail(false);
+          setTransaction(null);
+        }} />
     </PageBackground>
   );
 }
