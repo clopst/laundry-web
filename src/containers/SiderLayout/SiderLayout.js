@@ -18,16 +18,16 @@ import Transaction from '../Transaction/Transaction';
 import Dashboard from '../Dashboard/Dashboard';
 import Profile from '../Profile/Profile';
 import { useAuthContext } from '../../context/AuthContext';
+import { getStorageUrl } from '../../helpers/backendUrl';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Text } = Typography;
 
 const SiderLayout = (props) => {
   const [collapsed, setCollapsed] = useState(false);
-  const { logout } = useAuthContext();
+  const { user, logout } = useAuthContext();
   
   const handleCollapse = value => {
-    console.log(value);
     setCollapsed(value);
   }
 
@@ -99,7 +99,8 @@ const SiderLayout = (props) => {
           <Typography.Title level={3} style={{ marginTop: 8 }}>Laundry App</Typography.Title>
           <Dropdown overlay={profileMenu} trigger={['click']}>
             <Avatar 
-              size='default' 
+              size='default'
+              src={user?.avatar_path ? getStorageUrl(user.avatar_path) : null}
               icon={<UserOutlined />} 
               style={{ cursor: 'pointer' }} />
           </Dropdown>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Input } from 'antd';
+import { Button, Form, Input } from 'antd';
 
 const ChangePasswordProfileForm = (props) => (
   <Form
@@ -7,15 +7,14 @@ const ChangePasswordProfileForm = (props) => (
     form={props.form}
     initialValues={props.initialValues}
     onFinish={props.onFinish}
-    {...props}
   >
     <Form.Item
       name="current_password"
       label="Password Sekarang"
       rules={[
-        { required: true, message: 'Password sekarang dibutuhkan' }
+        { required: true, message: 'Password sekarang dibutuhkan' },
+        { min: 8, message: 'Password minimal 8 digit' }
       ]}
-      hasFeedback
     >
       <Input.Password />
     </Form.Item>
@@ -41,7 +40,7 @@ const ChangePasswordProfileForm = (props) => (
         { required: true, message: 'Harap konfirmasi password baru' },
         ({ getFieldValue }) => ({
           validator(_, value) {
-            if (!value || getFieldValue('password') === value) {
+            if (!value || getFieldValue('new_password') === value) {
               return Promise.resolve();
             }
 
@@ -51,6 +50,12 @@ const ChangePasswordProfileForm = (props) => (
       ]}
     >
       <Input.Password />
+    </Form.Item>
+
+    <Form.Item style={{ width: 100 }}>
+      <Button type="primary" htmlType="submit" className="login-form-button" loading={props.submitLoading}>
+        Submit
+      </Button>
     </Form.Item>
   </Form>
 );

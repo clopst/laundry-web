@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AuthContext } from './AuthContext';
-import { attemptLogin, attemptLogout, getLoggedInUser, getSanctumCookie } from '../services/login';
+import { attemptLogin, attemptLogout, getLoggedInUser, getSanctumCookie } from '../services/auth';
 import handleError from '../helpers/handleError';
 import Cookies from 'js-cookie'
 import { useHistory } from 'react-router';
@@ -37,7 +37,7 @@ const AuthProvider = (props) => {
       .then(() => {
         attemptLogin({ username, password })
           .then(res => {
-            setUser(res.data);
+            updateUser();
             setIsLoggedIn(true);
             Cookies.set(IS_LOGGED_IN_COOKIE, true, {expires: 86400, sameSite: 'lax'});
             history.push('/');
@@ -63,12 +63,22 @@ const AuthProvider = (props) => {
       });
   }
 
+  const updateUser = (cbSuccess) => {
+    getLoggedInUser()
+      .then(res => {
+        setUser(res.data);
+        cbSuccess();
+      })
+      .catch(err => handleError(err));
+  }
+
   const contextValue = {
-    loading,
-    user,
     isLoggedIn,
+    loading,
     login,
-    logout
+    logout,
+    user,
+    updateUser
   };
 
   return (
