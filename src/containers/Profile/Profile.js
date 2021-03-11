@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Col, Form, message, Row } from 'antd';
+import { Card, Col, Descriptions, Form, message, Row } from 'antd';
 import ProfileForm from '../../components/Form/ProfileForm/ProfileForm';
 import ChangePasswordProfileForm from '../../components/Form/ProfileForm/ChangePasswordProfileForm/ChangePasswordProfileForm';
 import { useAuthContext } from '../../context/AuthContext';
@@ -54,15 +54,51 @@ const Profile = (props) => {
       .finally(() => setSubmitLoading(false));
   }
 
+  const renderInfo = () => {
+    if (!user) return null;
+
+    const { role } = user;
+
+    if (role === 'owner') {
+      return (
+        <Descriptions.Item label="Outlet">
+          <ul style={{ padding: 0, margin: 0, listStyleType: 'none' }}>
+            {user.outlets.map(outlet => <li>{'- ' + outlet.name}</li>)}
+          </ul>
+        </Descriptions.Item>
+      )
+    } else if (role === 'cashier') {
+      return (
+        <Descriptions.Item label="Outlet">
+          {user.outlets[0].name}
+        </Descriptions.Item>
+      )
+    }
+
+    return null;
+  }
+
   return (
-    <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
+    <Row gutter={[32, 32]}>
       <Col className="gutter-row" span={14}>
-        <Card title="Informasi Profil">
+        <Card title="Ubah Profil">
           <ProfileForm 
             form={profileForm} 
             onFinish={handleSubmitProfile} 
             loading={loading}
             submitLoading={submitLoading} />
+        </Card>
+      </Col>
+      <Col className="gutter-row" span={10}>
+        <Card title="Infomasi Akun">
+          <Descriptions
+            bordered
+            column={1}
+            size="small"
+          >
+            <Descriptions.Item label="Role">{user?.role}</Descriptions.Item>
+            {renderInfo()}
+          </Descriptions>
         </Card>
       </Col>
       <Col className="gutter-row" span={10}>

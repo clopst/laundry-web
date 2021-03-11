@@ -50,12 +50,12 @@ const ProfileForm = (props) => {
           <Input />
         </Form.Item>
         
-        <Form.Item 
+        {/* <Form.Item 
           name="role"
           label="Role"
         >
           <Input disabled />
-        </Form.Item>
+        </Form.Item> */}
 
         <Form.Item style={{ width: 100 }}>
           <Button type="primary" htmlType="submit" className="login-form-button" loading={props.submitLoading}>
