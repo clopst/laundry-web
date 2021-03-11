@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { message, Popover, Upload } from 'antd';
-import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 
 const AvatarUpload = (props) => {
   // const [loading, setLoading] = useState(false);

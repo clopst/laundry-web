@@ -6,10 +6,13 @@ import { indexDashboard } from '../../services/dashboard';
 import handleError from '../../helpers/handleError';
 import { PAYMENT_STATUS, TRANSACTION_STATUS } from '../../helpers/const';
 import dayjs from 'dayjs';
+import { useAuthContext } from '../../context/AuthContext';
 
 const { Title } = Typography;
 
 const Dashboard = (props) => {
+  const { user } = useAuthContext();
+
   const [data, setData] = useState({});
   const [loading, setLoading] = useState([]);
 
@@ -31,43 +34,66 @@ const Dashboard = (props) => {
     fontSize: 32
   };
 
-  const cards = [
+  const cardList = [
     {
+      key: 'today_transactions_count',
       title: 'Transaksi Hari Ini',
       amount: data.today_transactions_count ?? 0,
       icon: <ShoppingOutlined style={iconStyle} />
     },
     {
+      key: 'customers_count',
       title: 'Jumlah Customer',
       amount: data.customers_count ?? 0,
       icon: <TeamOutlined style={iconStyle} />
     },
     {
+      key: 'outlets_count',
       title: 'Jumlah Outlet',
       amount: data.outlets_count ?? 0,
       icon: <ShopOutlined style={iconStyle} />
     },
     {
+      key: 'products_count',
       title: 'Jumlah Produk',
       amount: data.products_count ?? 0,
       icon: <SkinOutlined style={iconStyle} />
     }
   ];
 
-  const renderCards = cards.map(card => (
-    <Col key={card.title} className="gutter-row" span={6}>
-      <Card title={card.title}>
-        <Row>
-          <Col flex="auto">
-            <Title level={3}>{card.amount}</Title>
-          </Col>
-          <Col flex="none">
-            {card.icon}
-          </Col>
-        </Row>
-      </Card>
-    </Col>
-  ));
+  const renderCards = () => {
+    if (!user) {
+      return null;
+    }
+
+    const { role } = user;
+    
+    let keys = [];
+    let span = 6;
+    if (role === 'admin') {
+      keys = ['today_transactions_count', 'customers_count', 'outlets_count', 'products_count'];
+    } else if (role === 'owner') {
+      keys = ['today_transactions_count'];
+    } else if (role === 'cashier') {
+      keys = ['today_transactions_count', 'customers_count'];
+      span = 12;
+    }
+
+    return cardList.filter(card => keys.includes(card.key)).map(card => (
+      <Col key={card.key} className="gutter-row" span={span}>
+        <Card title={card.title}>
+          <Row>
+            <Col flex="auto">
+              <Title level={3}>{card.amount}</Title>
+            </Col>
+            <Col flex="none">
+              {card.icon}
+            </Col>
+          </Row>
+        </Card>
+      </Col>
+    ));
+  }
 
   // const dataSource = [
   //   {
@@ -151,7 +177,7 @@ const Dashboard = (props) => {
     // <PageBackground noBg>
     <Spin spinning={loading}>
       <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
-        {renderCards}
+        {renderCards()}
         <Col span={24} style={{ marginTop: 16, minHeight: '200px' }}>
           <Card title="Transaksi Terbaru">
             <Card.Meta description="Daftar 10 Transaksi Terakhir" />

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Avatar, Dropdown, Layout, Menu, Typography } from 'antd';
 import {
   PieChartOutlined,
@@ -23,12 +23,85 @@ import { getStorageUrl } from '../../helpers/backendUrl';
 const { Header, Content, Footer, Sider } = Layout;
 const { Text } = Typography;
 
+const ROUTE_LIST = [
+  {
+    path: '/users',
+    title: 'User Management',
+    icon: <UserOutlined />,
+    component: UserManagement
+  },
+  {
+    path: '/customers',
+    title: 'Customers',
+    icon: <TeamOutlined />,
+    component: Customer
+  },
+  {
+    path: '/outlets',
+    title: 'Outlets',
+    icon: <ShopOutlined />,
+    component: Outlet
+  },
+  {
+    path: '/products',
+    title: 'Products',
+    icon: <SkinOutlined />,
+    component: Product
+  },
+  {
+    path: '/transactions',
+    title: 'Transactions',
+    icon: <ShoppingOutlined />,
+    component: Transaction
+  }
+];
+
 const SiderLayout = (props) => {
-  const [collapsed, setCollapsed] = useState(false);
   const { user, logout } = useAuthContext();
+  
+  const [collapsed, setCollapsed] = useState(false);
+  const [routes, setRoutes] = useState([]);
+
+  useEffect(() => {
+    if (!user) {
+      setRoutes([]);
+      return null;
+    }
+
+    const { role } = user;
+    
+    let paths = [];
+    if (role === 'admin') {
+      paths = ['/users', '/customers', '/outlets', '/products', '/transactions'];
+    } else if (role === 'owner') {
+      paths = ['/transactions'];
+    } else if (role === 'cashier') {
+      paths = ['/customers', '/transactions'];
+    }
+
+    setRoutes(ROUTE_LIST.filter(route => paths.includes(route.path)));
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user])
   
   const handleCollapse = value => {
     setCollapsed(value);
+  }
+
+  const renderMenuItems = () => {
+    return routes.map(route => (
+      <Menu.Item key={route.path} icon={route.icon}>
+        <NavLink to={route.path}>
+          {route.title}
+        </NavLink>
+      </Menu.Item>
+    ));
+  }
+  
+  const renderRouteComponents = () => {
+    return routes.map(route => (
+        <Route key={route.path} path={route.path} exact component={route.component} />
+    ));
   }
 
   const profileMenu = (
@@ -56,36 +129,12 @@ const SiderLayout = (props) => {
           mode="inline"
           defaultSelectedKeys={['/']}
           selectedKeys={[props.location.pathname]}>
-          <Menu.Item key="/" icon={<PieChartOutlined />}>
-            <NavLink to="/">
-              Dashboard
-            </NavLink>
-          </Menu.Item>
-          <Menu.Item key="/users" icon={<UserOutlined />}>
-            <NavLink to="/users">
-              User Management
-            </NavLink>
-          </Menu.Item>
-          <Menu.Item key="/customers" icon={<TeamOutlined />}>
-            <NavLink to="/customers">
-              Customers
-            </NavLink>
-          </Menu.Item>
-          <Menu.Item key="/outlets" icon={<ShopOutlined />}>
-            <NavLink to="/outlets">
-              Outlets
-            </NavLink>
-          </Menu.Item>
-          <Menu.Item key="/products" icon={<SkinOutlined />}>
-            <NavLink to="/products">
-              Products
-            </NavLink>
-          </Menu.Item>
-          <Menu.Item key="/transactions" icon={<ShoppingOutlined />}>
-            <NavLink to="/transactions">
-              Transactions
-            </NavLink>
-          </Menu.Item>
+            <Menu.Item key="/" icon={<PieChartOutlined />}>
+              <NavLink to="/">
+                Dashboard
+              </NavLink>
+            </Menu.Item>
+            {renderMenuItems()}
         </Menu>
       </Sider>
 
@@ -115,12 +164,8 @@ const SiderLayout = (props) => {
 
           <Switch>
             <Route path="/" exact component={Dashboard} />
-            <Route path="/users" exact component={UserManagement} />
-            <Route path="/customers" exact component={Customer} />
-            <Route path="/outlets" exact component={Outlet} />
-            <Route path="/products" exact component={Product} />
-            <Route path="/transactions" exact component={Transaction} />
             <Route path="/profile" exact component={Profile} />
+            {renderRouteComponents()}
           </Switch>
         </Content>
 

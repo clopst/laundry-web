@@ -9,6 +9,8 @@ const destroyTransaction = id => apiDelete(`/api/transactions/${id}`);
 const getDropdownsTransaction = params => apiGet(`/api/transactions/dropdowns`, { params });
 const changeStatusTransaction = (id, data) => apiPost(`/api/transactions/${id}/change-status`, data);
 
+const exportTransaction = params => apiGet(`/api/transactions/export`, { params, responseType: 'blob' });
+
 export {
   indexTransaction,
   storeTransaction,
@@ -16,5 +18,6 @@ export {
   updateTransaction,
   destroyTransaction,
   getDropdownsTransaction,
-  changeStatusTransaction
+  changeStatusTransaction,
+  exportTransaction
 };

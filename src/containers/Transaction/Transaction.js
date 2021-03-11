@@ -4,13 +4,15 @@ import { Button, Form, Input, message, Modal, Popover, Space, Table } from 'antd
 import { DeleteOutlined, ExclamationCircleOutlined, FormOutlined, HighlightOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import 'dayjs/locale/id';
+import fileDownload from 'js-file-download';
 import PageHeader from '../../components/PageHeader/PageHeader';
 import TransactionForm from '../../components/Form/TransactionForm/TransactionForm';
 import { currencyFormatter } from '../../helpers/currency';
 import PageBackground from '../../components/PageBackground/PageBackground';
 import { 
   changeStatusTransaction, 
-  destroyTransaction, 
+  destroyTransaction,
+  exportTransaction,
   getDropdownsTransaction, 
   indexTransaction, 
   showTransaction, 
@@ -20,8 +22,12 @@ import {
 import handleError from '../../helpers/handleError';
 import { TRANSACTION_STATUS, PAYMENT_STATUS } from '../../helpers/const';
 import ChangeStatusTransactionForm from '../../components/Form/TransactionForm/ChangeStatusTransactionForm/ChangeStatusTransactionForm';
+import { useAuthContext } from '../../context/AuthContext';
+import ExportTransactionForm from '../../components/Form/TransactionForm/ExportTransactionForm/ExportTransactionForm';
 
 const Transaction = (props) => {
+  const { user } = useAuthContext();
+
   const [dataSource, setDataSource] = useState([]);
   const [dropdowns, setDropdowns] = useState({});
   const [loading, setLoading] = useState(false);
@@ -47,6 +53,8 @@ const Transaction = (props) => {
   const [visibleCreate, setVisibleCreate] = useState(false);
   const [visibleEdit, setVisibleEdit] = useState(false);
   const [visibleChangeStatus, setVisibleChangeStatus] = useState(false);
+  const [visibleExport, setVisibleExport] = useState(false);
+
   const [selectedId, setSelectedId] = useState(null);
   const [status, setStatus] = useState(null);
   const [payment, setPayment] = useState(null);
@@ -57,6 +65,7 @@ const Transaction = (props) => {
   const [createForm] = Form.useForm();
   const [editForm] = Form.useForm();
   const [changeStatusForm] = Form.useForm();
+  const [exportForm] = Form.useForm();
 
   // const dataSource = [
   //   {
@@ -279,6 +288,41 @@ const Transaction = (props) => {
       .finally(() => setConfirmLoading(false));
   }
 
+  const handleClickExport = () => {
+    setVisibleExport(true);
+    setFormLoading(true);
+    getDropdownsTransaction()
+      .then(res => {
+        setDropdowns(res.data);
+        if (res.data.outlets && user.role === 'cashier') {
+          exportForm.setFieldsValue({ outletIds: [res.data.outlets[0].value] });
+        }
+      })
+      .catch(err => {
+        handleError(err);
+        setVisibleExport(false);
+      })
+      .finally(() => setFormLoading(false));
+  }
+
+  const handleExport = (values) => {
+    const date = values.date ? [values.date[0].format('YYYY-MM-DD'), values.date[1].format('YYYY-MM-DD')] : [];
+    const params = {
+      ...values,
+      date
+    };
+
+    setConfirmLoading(true);
+    exportTransaction(params)
+      .then(res => {
+        fileDownload(res.data, 'transactions_report_' + dayjs().unix() + '.xlsx');
+        setConfirmLoading(false);
+        setVisibleExport(false);
+      })
+      .catch(err => handleError(err))
+      .finally(() => setConfirmLoading(false));
+  }
+
   const handleChangeTable = (pagination, filters, sorter, extra) => {
     const sort = {
       sortKey: sorter.order ? sorter.columnKey : 'id',
@@ -292,7 +336,7 @@ const Transaction = (props) => {
     });
   }
 
-  const columns = [
+  const columnList = [
     {
         title: 'Tanggal Transaksi',
         key: 'date',
@@ -376,11 +420,23 @@ const Transaction = (props) => {
     }
   ];
 
+  const [columns, setColumns] = useState(columnList);
+
+  useEffect(() => {
+    if (user?.role === 'owner') {
+      setColumns(columnList.filter(col => col.key !== 'actions'));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user])
+
   return (
     <PageBackground>
       <PageHeader title="Transactions">
         <Input placeholder="Search ..." onChange={handleSearch} />
-        <Button type="primary" onClick={handleClickCreate}>Create</Button>
+        { user?.role !== 'owner' && 
+          <Button type="primary" onClick={handleClickCreate}>Create</Button>
+        }
+        <Button type="primary" onClick={handleClickExport}>Generate Laporan</Button>
       </PageHeader>
 
       <Table 
@@ -433,6 +489,16 @@ const Transaction = (props) => {
         formLoading={formLoading}
         status={status}
         payment={payment} />
+
+      <ExportTransactionForm
+        form={exportForm}
+        formName="transaction-export-form"
+        visible={visibleExport}
+        onCreate={handleExport}
+        onCancel={() => setVisibleExport(false)}
+        confirmLoading={confirmLoading}
+        formLoading={formLoading}
+        outlets={dropdowns.outlets ?? []} />
     </PageBackground>
   );
 }

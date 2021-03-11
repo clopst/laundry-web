@@ -24,7 +24,9 @@ const ProfileForm = (props) => {
           name="avatar_path"
           label="Foto Profil"
         >
-          <AvatarUpload imageUrl={getStorageUrl(user.avatar_path)} handleImage={handleAvatar} />
+          <AvatarUpload 
+            imageUrl={user?.avatar_path ? getStorageUrl(user.avatar_path) : null} 
+            handleImage={handleAvatar} />
         </Form.Item>
 
         <Form.Item 
@@ -57,7 +59,7 @@ const ProfileForm = (props) => {
 
         <Form.Item style={{ width: 100 }}>
           <Button type="primary" htmlType="submit" className="login-form-button" loading={props.submitLoading}>
-            Submit
+            Simpan
           </Button>
         </Form.Item>
       </Form>

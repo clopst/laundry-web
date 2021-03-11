@@ -37,8 +37,8 @@ const AuthProvider = (props) => {
       .then(() => {
         attemptLogin({ username, password })
           .then(res => {
-            updateUser();
             setIsLoggedIn(true);
+            updateUser();
             Cookies.set(IS_LOGGED_IN_COOKIE, true, {expires: 86400, sameSite: 'lax'});
             history.push('/');
           })
